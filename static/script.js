@@ -1,23 +1,40 @@
-async function sendPrompt() {
+async function sendPrompt(){
 
-            const prompt = document.getElementById("prompt").value;
+    const prompt = document.getElementById("prompt");
 
-            const res = await fetch("/generate", {
+    const chatBox = document.getElementById("chatBox");
 
-                method: "POST",
+    const text = prompt.value.trim();
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+    if(text==="") return;
 
-                body: JSON.stringify({
-                    prompt: prompt
-                })
+    chatBox.innerHTML += `
+    <div class="message user">
+        <div class="avatar">😊</div>
+        <div class="bubble">${text}</div>
+    </div>
+    `;
 
-            });
+    prompt.value="";
 
-            const data = await res.json();
+    const res = await fetch("/generate",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            prompt:text
+        })
+    });
 
-            document.getElementById("response").innerText = data.response;
+    const data = await res.json();
 
+    chatBox.innerHTML += `
+    <div class="message bot">
+        <div class="avatar">🤖</div>
+        <div class="bubble">${data.response}</div>
+    </div>
+    `;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
 }

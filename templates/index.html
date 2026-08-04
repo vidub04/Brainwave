@@ -1,32 +1,58 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <title>Gemini + FastAPI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Brainwave</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-
-
-
 <body>
 
-    <h2>Ask Gemini</h2>
+<div class="container">
 
-    <textarea id="prompt" rows="6" cols="60"></textarea>
+    <header>
+        <div class="logo">
+            🤖 Interview Brainwave
+        </div>
 
-    <br><br>
+        <div class="stats">
+            <span>Question 3 / 10</span>
+            <span>⏱️ 18:42</span>
+        </div>
+    </header>
 
-    <button onclick="sendPrompt()">Generate</button>
+    <div class="chat-box" id="chatBox">
 
-    <h3>Response</h3>
+        <div class="message bot">
+            <div class="avatar">🤖</div>
 
-    <div id="response"></div>
+            <div class="bubble">
+                Welcome! I'll be your interviewer today.
 
+                <br><br>
+
+                Tell me about yourself.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="input-area">
+
+        <textarea
+                id="prompt"
+                placeholder="Type your answer..."
+        ></textarea>
+
+        <button onclick="sendPrompt()">
+            Send →
+        </button>
+
+    </div>
+
+</div>
+
+<script src="/static/script.js"></script>
 
 </body>
-
-<script src="/static/script.js">
-
-</script>
-
-
 </html>
