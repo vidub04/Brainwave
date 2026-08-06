@@ -2,6 +2,8 @@ for adding features
 
 first add required ui design changes along with required id,class to index.html
 
+add css for styling.
+
 
 then add required actions in javascript by adding event listener for that button/feature
 
