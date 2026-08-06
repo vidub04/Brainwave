@@ -1,14 +1,43 @@
+const landing=document.getElementById("landing");
+
+const interview=document.getElementById("interview");
+
+document.getElementById("startBtn").addEventListener("click",()=>{
+
+    landing.style.display="none";
+
+    interview.style.display="block";
+
+});
+
+let seconds=0;
+
+setInterval(()=>{
+
+    seconds++;
+
+    const min=Math.floor(seconds/60);
+
+    const sec=seconds%60;
+
+    document.getElementById("timer").innerText=
+
+    `${String(min).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+
+},1000);
+
+
 async function sendPrompt(){
 
-    const prompt = document.getElementById("prompt");
+    const prompt=document.getElementById("prompt");
 
-    const chatBox = document.getElementById("chatBox");
+    const chatBox=document.getElementById("chatBox");
 
-    const text = prompt.value.trim();
+    const text=prompt.value.trim();
 
     if(text==="") return;
 
-    chatBox.innerHTML += `
+    chatBox.innerHTML+=`
     <div class="message user">
         <div class="avatar">😊</div>
         <div class="bubble">${text}</div>
@@ -17,24 +46,31 @@ async function sendPrompt(){
 
     prompt.value="";
 
-    const res = await fetch("/generate",{
+    chatBox.scrollTop=chatBox.scrollHeight;
+
+    const res=await fetch("/generate",{
+
         method:"POST",
+
         headers:{
             "Content-Type":"application/json"
         },
+
         body:JSON.stringify({
             prompt:text
         })
+
     });
 
-    const data = await res.json();
+    const data=await res.json();
 
-    chatBox.innerHTML += `
+    chatBox.innerHTML+=`
     <div class="message bot">
         <div class="avatar">🤖</div>
         <div class="bubble">${data.response}</div>
     </div>
     `;
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.scrollTop=chatBox.scrollHeight;
+
 }

@@ -4,53 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Brainwave</title>
+
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 
-<div class="container">
+<!-- Landing Page -->
 
-    <header>
-        <div class="logo">
-            🤖 Interview Brainwave
+<section id="landing" class="landing">
+
+    <div class="hero">
+
+        <div class="logo-circle">
+            🧠
         </div>
 
-        <div class="stats">
-            <span>Question 3 / 10</span>
-            <span>⏱️ 18:42</span>
-        </div>
-    </header>
+        <h1>Interview Brainwave</h1>
 
-    <div class="chat-box" id="chatBox">
+        <p>
+            Practice realistic AI-powered mock interviews with
+            technical and HR interviewers.
+        </p>
 
-        <div class="message bot">
-            <div class="avatar">🤖</div>
+        <br>
+        <br>
+        <br>
 
-            <div class="bubble">
-                Welcome! I'll be your interviewer today.
-
-                <br><br>
-
-                Tell me about yourself.
-            </div>
-        </div>
-
-    </div>
-
-    <div class="input-area">
-
-        <textarea
-                id="prompt"
-                placeholder="Type your answer..."
-        ></textarea>
-
-        <button onclick="sendPrompt()">
-            Send →
+        <button id="startBtn">
+            🚀 Let's Begin Interview
         </button>
 
     </div>
 
+</section>
+
+
+
+<!-- Interview Screen -->
+
+<section id="interview" class="hidden">
+
+<header>
+
+    <h2>Interview Brainwave</h2>
+
+    <div class="status">
+
+        <span id="questionNo">
+            Question 1 / 11
+        </span>
+
+        <span>
+            ⏱️ <span id="timer">00:00</span>
+        </span>
+
+    </div>
+
+</header>
+
+
+<div class="chat-box" id="chatBox">
+
+    <div class="message bot">
+
+        <div class="avatar">
+            🤖
+        </div>
+
+        <div class="bubble">
+            Welcome to Interview Brainwave!
+
+            Please introduce yourself and tell me the role you're applying for.
+        </div>
+
+    </div>
+
 </div>
+
+
+<div class="input-area">
+
+    <textarea
+            id="prompt"
+            placeholder="Type your answer..."
+    ></textarea>
+
+    <button onclick="sendPrompt()">
+        Send
+    </button>
+
+</div>
+
+</section>
+
 
 <script src="/static/script.js"></script>
 
