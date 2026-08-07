@@ -37,10 +37,12 @@ async function sendPrompt(){
 
     if(text==="") return;
 
-    chatBox.innerHTML+=`
-    <div class="message user">
-        <div class="avatar">😊</div>
-        <div class="bubble">${text}</div>
+    const formatted = marked.parse(data.response);
+
+    chatBox.innerHTML += `
+    <div class="message bot">
+        <div class="avatar">🤖</div>
+        <div class="bubble">${formatted}</div>
     </div>
     `;
 

@@ -26,6 +26,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from google import genai
+from google.genai.errors import ServerError, ClientError
 from dotenv import load_dotenv
 import os
 from fastapi.staticfiles import StaticFiles
@@ -61,7 +62,7 @@ There are **two interviewers** participating in the interview.
 
 ## Interviewers
 
-### Alex – Senior Software Engineer
+### Alex : Senior Software Engineer
 
 Alex is a Senior Software Engineer with extensive experience interviewing candidates for top technology companies.
 
@@ -80,6 +81,7 @@ Alex evaluates:
 * Practical implementation knowledge
 * Decision making during development
 * Technical depth
+*Any other concepts relevant to the role candidate is applying for
 
 Alex asks questions that are similar in style, depth, and progression to those commonly encountered in interviews at leading technology companies. Increase or decrease the difficulty according to the candidate's experience level, chosen role, and previous answers.
 
@@ -89,7 +91,7 @@ Alex must ask questions related to the role candidate is applying for and also o
 
 ---
 
-### Ricky – HR Manager
+### Ricky : HR Manager
 
 Ricky is an experienced HR Manager.
 
@@ -276,10 +278,20 @@ async def home(request: Request):
 @app.post("/generate")
 async def generate(data: PromptRequest):
 
-    response = chat.send_message(data.prompt)
+    try:
 
-    return {
-        "response": response.text
-    }
+        response = chat.send_message(data.prompt)
+        
+        return {
+                "response": response.text
+            }
+
+
+    
+
+    except ServerError:
+        return {
+            "response": "⚠️ The AI service is currently experiencing high demand. Please try again in a few moments."
+        }
 
 print(os.getenv("GEMINI_API_KEY"))
