@@ -44,7 +44,7 @@ async def login_page(request: Request):
 @app.post("/generate")
 async def generate(data: PromptRequest, user=Depends(get_current_user)):
 
-    try:
+    
 
     conversation_id = data.conversation_id
 
@@ -183,7 +183,7 @@ After Q11: warm ending, then scorecard — Technical Knowledge, Problem Solving,
     try:
 
         response = chat.send_message(data.prompt)
-        
+
     except ServerError:
         return {
             "response": "⚠️ Gemini is currently experiencing high demand. Please try again shortly."
