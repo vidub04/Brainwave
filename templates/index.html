@@ -4,103 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interview Brainwave</title>
-
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
 <!-- Landing Page -->
-
 <section id="landing" class="landing">
-
     <div class="hero">
-
-        <div class="logo-circle">
-            🧠
-        </div>
-
+        <div class="logo-circle">🧠</div>
         <h1>Interview Brainwave</h1>
-
         <p>
             Practice realistic AI-powered mock interviews with
             technical and HR interviewers.
         </p>
-
-        <br>
-        <br>
-        <br>
-
-        <button id="startBtn">
-            🚀 Let's Begin Interview
-        </button>
-
+        <br><br><br>
+        <button id="startBtn">🚀 Let's Begin Interview</button>
     </div>
-
 </section>
 
-
-
-<!-- Interview Screen -->
-
+<!-- Interview Screen (auth-gated, starts hidden) -->
 <section id="interview" class="hidden">
 
-<header>
+    <header>
+        <div class="logo">🤖 Interview Brainwave</div>
 
-    <h2>Interview Brainwave</h2>
+        <div class="stats">
+            <span id="questionNo">Question 1 / 11</span>
+            <span>⏱️ <span id="timer">00:00</span></span>
+            <label for="resumeInput" style="cursor:pointer;">📄 Upload resume</label>
+            <input id="resumeInput" type="file" accept=".pdf,.docx" style="display:none;" onchange="uploadResume()">
+            <button onclick="signOut()" style="width:auto; padding:6px 10px;">Log out</button>
+        </div>
+    </header>
 
-    <div class="status">
-
-        <span id="questionNo">
-            Question 1 / 11
-        </span>
-
-        <span>
-            ⏱️ <span id="timer">00:00</span>
-        </span>
-
+    <div class="chat-box" id="chatBox">
+        <div class="message bot">
+            <div class="avatar">🤖</div>
+            <div class="bubble">
+                Welcome! I'll be your interviewer today.
+                <br><br>
+                Please introduce yourself and tell me the role you're applying for.
+            </div>
+        </div>
     </div>
 
-</header>
-
-
-<div class="chat-box" id="chatBox">
-
-    <div class="message bot">
-
-        <div class="avatar">
-            🤖
-        </div>
-
-        <div class="bubble">
-            Welcome to Interview Brainwave!
-
-            Please introduce yourself and tell me the role you're applying for.
-        </div>
-
+    <div class="input-area">
+        <textarea id="prompt" placeholder="Type your answer..."></textarea>
+        <button onclick="sendPrompt()">Send →</button>
     </div>
-
-</div>
-
-
-<div class="input-area">
-
-    <textarea
-            id="prompt"
-            placeholder="Type your answer..."
-    ></textarea>
-
-    <button onclick="sendPrompt()">
-        Send
-    </button>
-
-</div>
 
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
+<script src="/static/config.js"></script>
+<script src="/static/auth.js"></script>
 <script src="/static/script.js"></script>
-
 </body>
 </html>

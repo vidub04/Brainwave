@@ -6,309 +6,206 @@
 }
 
 body{
-
     background:linear-gradient(135deg,#1D1F20,#0A74DA,#2D9CDB,#0EBB8A,#A9D8D5);
-
     min-height:100vh;
-
+    color:white;
 }
 
-/* Landing */
+/* ---------- Landing ---------- */
 
 .landing{
-
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
-
 }
 
 .hero{
-
     width:900px;
-
     padding:60px;
-
     text-align:center;
-
     border-radius:28px;
-
     background:rgba(1,18,54,0.72);
-
     backdrop-filter:blur(18px);
-
     -webkit-backdrop-filter:blur(18px);
-
     border:1px solid rgba(255,255,255,0.18);
-
     box-shadow:
         0 20px 60px rgba(0,0,0,.25),
         inset 0 1px 1px rgba(255,255,255,.15);
-
 }
 
 .logo-circle{
-
     width:100px;
     height:100px;
-
     border-radius:50%;
-
     margin:auto;
-
     background:linear-gradient(135deg,#040860,#1865c2);
-
     display:flex;
-
     align-items:center;
-
     justify-content:center;
-
     font-size:45px;
-
     color:white;
-
 }
 
 .hero h1{
-
     margin-top:25px;
-
     font-size:50px;
-
     color:#f2f8f7;
-
 }
 
 .hero p{
-
     margin-top:15px;
-
-    color:#7d9a8c;
-
+    color:#c9d9e6;
     font-size:18px;
-
-}
-
-.features{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:25px;
-
-    margin:45px 0;
-
-}
-
-.card{
-
-    width:180px;
-
-    height:130px;
-
-    border-radius:18
-
 }
 
 #startBtn{
-
     padding:18px 45px;
-
     border:none;
-
     border-radius:50px;
-
     background:linear-gradient(90deg,#040860,#1865c2);
-
     color:white;
-
     font-size:18px;
-
     cursor:pointer;
-
     transition:.3s;
-
 }
 
 #startBtn:hover{
-
     transform:scale(1.05);
-
 }
-
-/* Interview */
 
 .hidden{
-
     display:none;
-
 }
 
+/* ---------- Interview (dark theme, matches login.html) ---------- */
+
 #interview{
+    width:900px;
+    height:90vh;
+    margin:5vh auto;
 
-    width:1100px;
+    background:#1f2937;
+    border-radius:18px;
 
-    margin:35px auto;
-
-    background:white;
-
-    border-radius:20px;
-
-    box-shadow:0 10px 40px rgba(0,0,0,.1);
+    display:flex;
+    flex-direction:column;
 
     overflow:hidden;
+}
 
+/* generic .container kept as an alias in case other templates reuse it */
+.container{
+    width:900px;
+    height:90vh;
+    background:#1f2937;
+    border-radius:18px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
 }
 
 header{
-
+    padding:20px;
     display:flex;
-
     justify-content:space-between;
-
     align-items:center;
+    background:#111827;
+    border-bottom:1px solid #374151;
+}
 
-    padding:22px 35px;
+.logo{
+    font-size:22px;
+    font-weight:bold;
+}
 
-    background:linear-gradient(90deg,#040860,#1865c2);
-
-    color:white;
-
+.stats{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    color:#9ca3af;
+    font-size:14px;
 }
 
 .chat-box{
-
-    height:520px;
-
+    flex:1;
     overflow-y:auto;
-
     padding:30px;
-
-    background:#fafcff;
-
 }
 
 .message{
-
     display:flex;
-
-    margin-bottom:25px;
-
-}
-
-.user{
-
-    flex-direction:row-reverse;
-
+    margin-bottom:20px;
+    align-items:flex-start;
 }
 
 .avatar{
-
-    width:50px;
-
-    height:50px;
-
+    width:45px;
+    height:45px;
     border-radius:50%;
-
-    background:#040860;
-
     display:flex;
-
-    justify-content:center;
-
     align-items:center;
-
-    color:white;
-
+    justify-content:center;
+    background:#374151;
     font-size:22px;
-
-}
-
-.user .avatar{
-
-    background:#1865c2;
-
+    margin-right:15px;
 }
 
 .bubble{
-
     max-width:70%;
-
-    padding:18px;
-
-    margin:0 15px;
-
-    border-radius:18px;
-
+    padding:16px;
+    border-radius:15px;
     line-height:1.6;
+}
 
-    background:white;
+.bot .bubble{
+    background:#374151;
+}
 
-    box-shadow:0 5px 18px rgba(0,0,0,.08);
+.user{
+    flex-direction:row-reverse;
+}
 
+.user .avatar{
+    margin-left:15px;
+    margin-right:0;
 }
 
 .user .bubble{
-
-    background:#dff2ff;
-
+    background:#2563eb;
 }
 
 .input-area{
-
     display:flex;
-
-    padding:25px;
-
+    padding:20px;
+    background:#111827;
     gap:15px;
-
-    background:white;
-
 }
 
 textarea{
-
     flex:1;
-
     resize:none;
-
-    height:70px;
-
-    border-radius:14px;
-
-    border:1px solid #ddd;
-
+    height:65px;
     padding:15px;
-
-    font-size:16px;
-
-}
-
-textarea:focus{
-
+    border:none;
     outline:none;
-
-    border-color:#6d5dfc;
-
+    border-radius:12px;
+    background:#374151;
+    color:white;
+    font-size:16px;
 }
 
 button{
-
-    width:600px;
-
+    width:120px;
     border:none;
-
-    border-radius:15px;
-
-    background:linear-gradient(90deg,#040860,#1865c2);
-
+    border-radius:12px;
+    background:#2563eb;
     color:white;
-
-    font-size:18px;
-
     cursor:pointer;
+    font-size:16px;
+    transition:.3s;
+}
 
+button:hover{
+    background:#1d4ed8;
 }
