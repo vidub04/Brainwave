@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from google import genai
+from google.genai import types
 from dotenv import load_dotenv
 import os
 
@@ -156,23 +157,26 @@ Do not deviate from this order unless a follow-up question is necessary.
 # Interview Completion
 After Q11: warm ending, then scorecard — Technical Knowledge, Problem Solving, Core CS Fundamentals, Project Knowledge, Communication, Confidence, Leadership, Behavioral Skills (all /10) — plus Strengths, Areas for Improvement, Recommended Study Topics, Hiring Recommendation (Strong Hire/Hire/Borderline/No Hire), ending encouragingly.    """
 
-    history_text = "\n".join(f"{h['role']}: {h['content']}" for h in history_rows)
     resume_text = f"\nCandidate resume summary: {resume_context}\n" if resume_context else ""
+    system_instruction = SYSTEM_PROMPT + resume_text
 
-    full_prompt = f"""
-    {SYSTEM_PROMPT}
-    {resume_text}
-    Conversation so far:
-    {history_text}
+    # Convert our stored messages into Gemini's Content objects.
+    # Gemini's chat API uses role "model" for the assistant, not "bot".
+    gemini_history = [
+        types.Content(
+            role="model" if h["role"] == "bot" else "user",
+            parts=[types.Part(text=h["content"])],
+        )
+        for h in history_rows
+    ]
 
-    User:
-    {data.prompt}
-    """
-
-    response = client.models.generate_content(
+    chat = client.chats.create(
         model="gemini-3.6-flash",
-        contents=full_prompt,
+        history=gemini_history,
+        config=types.GenerateContentConfig(system_instruction=system_instruction),
     )
+
+    response = chat.send_message(data.prompt)
 
     # Save both turns to history
     supabase.table("messages").insert([
