@@ -6,4 +6,8 @@ google-genai
 python-multipart
 supabase
 pdfplumber
+<<<<<<< HEAD
 python-docx
+=======
+python-docx
+>>>>>>> 0d2b6a40ecf63f4271a93ecc6d62cb1d37002f14
