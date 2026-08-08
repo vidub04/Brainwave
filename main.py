@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from google import genai
 from google.genai import types
-from google.genai.errors import ServerError,ClientError
+from google.genai.errors import ServerError, ClientError
 from dotenv import load_dotenv
 import os
 
@@ -44,8 +44,6 @@ async def login_page(request: Request):
 @app.post("/generate")
 async def generate(data: PromptRequest, user=Depends(get_current_user)):
 
-    
-
     conversation_id = data.conversation_id
 
     # Create a conversation if this is the first message
@@ -71,6 +69,13 @@ async def generate(data: PromptRequest, user=Depends(get_current_user)):
         .limit(1) \
         .execute().data
     resume_context = resume_rows[0]["structured"] if resume_rows else None
+
+    # How many answers has the candidate already given, including the one
+    # arriving in this request? The model can't reliably self-count turns
+    # once follow-ups mix in, so we track this explicitly and tell it.
+    prior_user_answers = sum(1 for h in history_rows if h["role"] == "user")
+    current_answer_number = prior_user_answers + 1
+    should_conclude = current_answer_number >= 11
 
     SYSTEM_PROMPT = """
 
@@ -195,7 +200,20 @@ Keep it valid JSON. recommendation must be exactly one of: "Strong Hire", "Hire"
     """
 
     resume_text = f"\nCandidate resume summary: {resume_context}\n" if resume_context else ""
-    system_instruction = SYSTEM_PROMPT + resume_text
+
+    # Explicit turn-tracking state — the model can't reliably self-count
+    # turns once follow-ups are mixed in, so we tell it directly.
+    if should_conclude:
+        state_instruction = f"""
+STATE: The candidate has now answered {current_answer_number} questions (including the one in this request). The interview is OVER as of this message.
+You MUST NOT ask any further questions. Respond ONLY with: a warm closing message, the prose scorecard, and the fenced JSON scorecard block exactly as specified in the Output Format section above. Use [DIFFICULTY:final] in the metadata line.
+"""
+    else:
+        state_instruction = f"""
+STATE: This message is your response following the candidate's answer #{current_answer_number} of 11 total. Continue the interview per the structure and speaker rotation above. Do not conclude or produce a scorecard yet — there are more questions remaining.
+"""
+
+    system_instruction = SYSTEM_PROMPT + resume_text + state_instruction
 
     # Convert our stored messages into Gemini's Content objects.
     # Gemini's chat API uses role "model" for the assistant, not "bot".
@@ -214,22 +232,17 @@ Keep it valid JSON. recommendation must be exactly one of: "Strong Hire", "Hire"
     )
 
     try:
-
         response = chat.send_message(data.prompt)
-
     except ServerError:
         return {
-            "response": "⚠️ Gemini is currently experiencing high demand. Please try again shortly."
+            "response": "⚠️ Gemini is currently experiencing high demand. Please try again shortly.",
+            "conversation_id": conversation_id,
         }
-
     except ClientError:
         return {
-            "response": "⚠️ There was an issue communicating with Gemini."
+            "response": "⚠️ There was an issue communicating with Gemini.",
+            "conversation_id": conversation_id,
         }
-
-
-
-    
 
     # Save both turns to history
     supabase.table("messages").insert([
