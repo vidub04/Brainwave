@@ -209,3 +209,120 @@ button{
 button:hover{
     background:#1d4ed8;
 }
+
+/* ---------- Feature additions: personas, difficulty badge, scorecard ---------- */
+
+.speaker-name{
+    font-size:12px;
+    font-weight:bold;
+    color:#93c5fd;
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+}
+
+#difficultyBadge{
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:20px;
+    padding:4px 12px;
+    white-space:nowrap;
+}
+
+.scorecard-card{
+    background:#111827;
+    border:1px solid #374151;
+    border-radius:16px;
+    padding:24px;
+    margin:20px 0 30px 60px;
+    max-width:75%;
+}
+
+.scorecard-card h3{
+    margin-bottom:18px;
+    color:#f2f8f7;
+}
+
+.score-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.score-label{
+    width:170px;
+    font-size:13px;
+    color:#c9d9e6;
+    flex-shrink:0;
+}
+
+.score-bar{
+    flex:1;
+    height:10px;
+    background:#374151;
+    border-radius:6px;
+    overflow:hidden;
+}
+
+.score-fill{
+    height:100%;
+    background:linear-gradient(90deg,#0EBB8A,#2D9CDB);
+    border-radius:6px;
+    transition:width .6s ease;
+}
+
+.score-value{
+    width:40px;
+    font-size:13px;
+    color:#9ca3af;
+    text-align:right;
+    flex-shrink:0;
+}
+
+.score-list{
+    margin-top:16px;
+}
+
+.score-list h4{
+    font-size:14px;
+    color:#93c5fd;
+    margin-bottom:6px;
+}
+
+.score-list ul{
+    padding-left:20px;
+    font-size:14px;
+    color:#c9d9e6;
+    line-height:1.6;
+}
+
+.recommendation-badge{
+    display:inline-block;
+    margin-top:18px;
+    padding:8px 18px;
+    border-radius:20px;
+    font-weight:bold;
+    font-size:14px;
+    background:#374151;
+}
+
+.recommendation-badge.strong-hire{
+    background:#0EBB8A;
+    color:#062a20;
+}
+
+.recommendation-badge.hire{
+    background:#2D9CDB;
+    color:#062a4d;
+}
+
+.recommendation-badge.borderline{
+    background:#eab308;
+    color:#3f2d00;
+}
+
+.recommendation-badge.no-hire{
+    background:#ef4444;
+    color:#3f0d0d;
+}

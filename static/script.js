@@ -56,13 +56,128 @@ async function loadHistory(id) {
 
 function appendMessage(role, text) {
     const chatBox = document.getElementById("chatBox");
-    const avatar = role === "user" ? "😊" : "🤖";
+
+    if (role !== "user") {
+        const parsed = parseBotMessage(text);
+
+        if (parsed.difficulty && parsed.difficulty !== "final") {
+            updateDifficultyBadge(parsed.difficulty);
+        }
+
+        const avatar = parsed.speaker === "Ricky" ? "👔" : "🧑‍💻";
+        const name = parsed.speaker || "Interviewer";
+
+        chatBox.innerHTML += `
+        <div class="message bot" data-speaker="${name}">
+            <div class="avatar">${avatar}</div>
+            <div class="bubble">
+                <div class="speaker-name">${name}</div>
+                ${formatMessageText(parsed.message)}
+            </div>
+        </div>
+        `;
+
+        if (parsed.scorecard) {
+            renderScorecard(parsed.scorecard);
+        }
+        return;
+    }
+
     chatBox.innerHTML += `
-    <div class="message ${role === "user" ? "user" : "bot"}">
-        <div class="avatar">${avatar}</div>
-        <div class="bubble">${text}</div>
+    <div class="message user">
+        <div class="avatar">😊</div>
+        <div class="bubble">${formatMessageText(text)}</div>
     </div>
     `;
+}
+
+// Splits a raw bot reply into: speaker, difficulty, visible message text,
+// and (on the final message) the structured scorecard JSON.
+function parseBotMessage(raw) {
+    let text = raw;
+    let speaker = null;
+    let difficulty = null;
+    let scorecard = null;
+
+    const metaMatch = text.match(/^\[SPEAKER:(Alex|Ricky)\]\[DIFFICULTY:(rising|steady|easing|final)\]\s*/);
+    if (metaMatch) {
+        speaker = metaMatch[1];
+        difficulty = metaMatch[2];
+        text = text.slice(metaMatch[0].length).trim();
+    }
+
+    const jsonMatch = text.match(/```json\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+        try {
+            scorecard = JSON.parse(jsonMatch[1]);
+        } catch (e) {
+            scorecard = null; // model produced malformed JSON — fail gracefully, just skip the visual
+        }
+        text = text.slice(0, jsonMatch.index).trim();
+    }
+
+    return { speaker, difficulty, message: text, scorecard };
+}
+
+function formatMessageText(text) {
+    // Basic newline -> <br> so paragraph breaks show up in the bubble
+    return text.replace(/\n/g, "<br>");
+}
+
+function updateDifficultyBadge(difficulty) {
+    const badge = document.getElementById("difficultyBadge");
+    if (!badge) return;
+    const labels = {
+        rising: "🔺 Difficulty: Rising",
+        steady: "➖ Difficulty: Steady",
+        easing: "🔻 Difficulty: Easing",
+    };
+    badge.innerText = labels[difficulty] || "Difficulty: Steady";
+}
+
+function renderScorecard(data) {
+    const chatBox = document.getElementById("chatBox");
+    const scores = data.scorecard || {};
+
+    const labelMap = {
+        technical_knowledge: "Technical Knowledge",
+        problem_solving: "Problem Solving",
+        core_cs_fundamentals: "Core CS Fundamentals",
+        project_knowledge: "Project Knowledge",
+        communication: "Communication",
+        confidence: "Confidence",
+        leadership: "Leadership",
+        behavioral_skills: "Behavioral Skills",
+    };
+
+    const barsHtml = Object.entries(labelMap).map(([key, label]) => {
+        const value = Math.max(0, Math.min(10, Number(scores[key]) || 0));
+        return `
+        <div class="score-row">
+            <span class="score-label">${label}</span>
+            <div class="score-bar"><div class="score-fill" style="width:${value * 10}%"></div></div>
+            <span class="score-value">${value}/10</span>
+        </div>`;
+    }).join("");
+
+    const listHtml = (title, items) => {
+        if (!items || !items.length) return "";
+        return `<div class="score-list"><h4>${title}</h4><ul>${items.map(i => `<li>${i}</li>`).join("")}</ul></div>`;
+    };
+
+    const recClass = (data.recommendation || "").toLowerCase().replace(/\s+/g, "-");
+
+    chatBox.innerHTML += `
+    <div class="scorecard-card">
+        <h3>📊 Interview Scorecard</h3>
+        ${barsHtml}
+        ${listHtml("Strengths", data.strengths)}
+        ${listHtml("Areas for Improvement", data.areas_for_improvement)}
+        ${listHtml("Recommended Study Topics", data.study_topics)}
+        <div class="recommendation-badge ${recClass}">${data.recommendation || "—"}</div>
+    </div>
+    `;
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 async function sendPrompt() {
