@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from google import genai
 from google.genai import types
+from google.genai.errors import ServerError,ClientError
 from dotenv import load_dotenv
 import os
 
@@ -42,6 +43,9 @@ async def login_page(request: Request):
 
 @app.post("/generate")
 async def generate(data: PromptRequest, user=Depends(get_current_user)):
+
+    
+
     conversation_id = data.conversation_id
 
     # Create a conversation if this is the first message
@@ -140,7 +144,8 @@ Ricky asks follow-up questions whenever an answer lacks detail.
 Conduct exactly 11 questions.
 Distribution: 1.Ricky 2.Alex 3.Alex 4.Ricky 5.Alex 6.Alex 7.Ricky 8.Alex 9.Alex 10.Ricky 11.Alex
 Alex asks 7 questions. Ricky asks 4 questions.
-Do not deviate from this order unless a follow-up question is necessary.
+Do not deviate from this order unless a follow-up question is necessary. If a follow up question is required , Alex asks all tech related questions
+and Ricky asks all personal and situation(real life scenarios) related questions.
 
 # Adaptive Difficulty
 [increase depth if candidate does well, ease off if they struggle, never intentionally fail them]
@@ -208,7 +213,23 @@ Keep it valid JSON. recommendation must be exactly one of: "Strong Hire", "Hire"
         config=types.GenerateContentConfig(system_instruction=system_instruction),
     )
 
-    response = chat.send_message(data.prompt)
+    try:
+
+        response = chat.send_message(data.prompt)
+
+    except ServerError:
+        return {
+            "response": "⚠️ Gemini is currently experiencing high demand. Please try again shortly."
+        }
+
+    except ClientError:
+        return {
+            "response": "⚠️ There was an issue communicating with Gemini."
+        }
+
+
+
+    
 
     # Save both turns to history
     supabase.table("messages").insert([
