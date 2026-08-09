@@ -326,3 +326,63 @@ button:hover{
     background:#ef4444;
     color:#3f0d0d;
 }
+
+.code-bubble{
+    background:#0d1117;
+    border:1px solid #30363d;
+    border-radius:8px;
+    padding:14px;
+    overflow-x:auto;
+    font-family:"Consolas","Monaco",monospace;
+    font-size:13px;
+    color:#c9d1d9;
+    margin:0;
+    white-space:pre;
+}
+
+.code-editor-panel{
+    background:#0d1117;
+    border:1px solid #30363d;
+    border-radius:12px;
+    padding:16px;
+    margin:0 20px 20px 20px;
+}
+
+.code-editor-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+    font-size:13px;
+    color:#93c5fd;
+}
+
+.code-editor-header select{
+    background:#161b22;
+    color:#c9d1d9;
+    border:1px solid #30363d;
+    border-radius:6px;
+    padding:4px 8px;
+    font-size:13px;
+}
+
+.code-input{
+    width:100%;
+    min-height:200px;
+    background:#161b22;
+    color:#c9d1d9;
+    border:1px solid #30363d;
+    border-radius:8px;
+    padding:12px;
+    font-family:"Consolas","Monaco",monospace;
+    font-size:14px;
+    line-height:1.5;
+    resize:vertical;
+    tab-size:4;
+}
+
+.code-editor-panel button{
+    margin-top:10px;
+    width:auto;
+    padding:8px 18px;
+}

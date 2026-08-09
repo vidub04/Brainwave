@@ -14,6 +14,8 @@ let questionCount = 1;
         startTimer();
     });
 
+    toggleCodeEditor(false);
+
     const res = await fetch("/conversations", {
         headers: { "Authorization": `Bearer ${accessToken}` }
     });
@@ -80,15 +82,30 @@ function appendMessage(role, text) {
         if (parsed.scorecard) {
             renderScorecard(parsed.scorecard);
         }
+
+        toggleCodeEditor(parsed.codeRequired === true);
         return;
     }
+
+    // A user "message" containing a fenced code block gets rendered as code
+    const codeBlockMatch = text.match(/```[\w]*\n?([\s\S]*?)```/);
+    const bubbleContent = codeBlockMatch
+        ? `<pre class="code-bubble"><code>${escapeHtml(codeBlockMatch[1].trim())}</code></pre>`
+        : formatMessageText(text);
 
     chatBox.innerHTML += `
     <div class="message user">
         <div class="avatar">😊</div>
-        <div class="bubble">${formatMessageText(text)}</div>
+        <div class="bubble">${bubbleContent}</div>
     </div>
     `;
+}
+
+function escapeHtml(str) {
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 }
 
 // Splits a raw bot reply into: speaker, difficulty, visible message text,
@@ -99,10 +116,12 @@ function parseBotMessage(raw) {
     let difficulty = null;
     let scorecard = null;
 
-    const metaMatch = text.match(/^\[SPEAKER:(Alex|Ricky)\]\[DIFFICULTY:(rising|steady|easing|final)\]\s*/);
+    const metaMatch = text.match(/^\[SPEAKER:(Alex|Ricky)\]\[DIFFICULTY:(rising|steady|easing|final)\](?:\[CODE:(true|false)\])?\s*/);
+    let codeRequired = false;
     if (metaMatch) {
         speaker = metaMatch[1];
         difficulty = metaMatch[2];
+        codeRequired = metaMatch[3] === "true";
         text = text.slice(metaMatch[0].length).trim();
     }
 
@@ -116,7 +135,7 @@ function parseBotMessage(raw) {
         text = text.slice(0, jsonMatch.index).trim();
     }
 
-    return { speaker, difficulty, message: text, scorecard };
+    return { speaker, difficulty, message: text, scorecard, codeRequired };
 }
 
 function formatMessageText(text) {
@@ -133,6 +152,36 @@ function updateDifficultyBadge(difficulty) {
         easing: "🔻 Difficulty: Easing",
     };
     badge.innerText = labels[difficulty] || "Difficulty: Steady";
+}
+
+function toggleCodeEditor(show) {
+    const panel = document.getElementById("codeEditorPanel");
+    const textInput = document.getElementById("prompt");
+    const sendBtn = document.getElementById("sendTextBtn");
+    if (!panel) return;
+
+    if (show) {
+        panel.classList.remove("hidden");
+        textInput.classList.add("hidden");
+        sendBtn.classList.add("hidden");
+    } else {
+        panel.classList.add("hidden");
+        textInput.classList.remove("hidden");
+        sendBtn.classList.remove("hidden");
+    }
+}
+
+async function submitCode() {
+    const codeInput = document.getElementById("codeInput");
+    const langSelect = document.getElementById("codeLanguage");
+    const code = codeInput.value.trim();
+    if (code === "") return;
+
+    const language = langSelect.value;
+    const wrapped = "```" + language + "\n" + code + "\n```";
+
+    await sendPromptText(wrapped);
+    codeInput.value = "";
 }
 
 function renderScorecard(data) {
@@ -182,12 +231,17 @@ function renderScorecard(data) {
 
 async function sendPrompt() {
     const promptEl = document.getElementById("prompt");
-    const chatBox = document.getElementById("chatBox");
     const text = promptEl.value.trim();
     if (text === "") return;
+    promptEl.value = "";
+    await sendPromptText(text);
+}
+
+// Shared by both the plain-text send button and the code editor's submit button.
+async function sendPromptText(text) {
+    const chatBox = document.getElementById("chatBox");
 
     appendMessage("user", text);
-    promptEl.value = "";
     chatBox.scrollTop = chatBox.scrollHeight;
 
     const res = await fetch("/generate", {

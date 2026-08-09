@@ -52,7 +52,22 @@
 
     <div class="input-area">
         <textarea id="prompt" placeholder="Type your answer..."></textarea>
-        <button onclick="sendPrompt()">Send →</button>
+        <button id="sendTextBtn" onclick="sendPrompt()">Send →</button>
+    </div>
+
+    <div id="codeEditorPanel" class="code-editor-panel hidden">
+        <div class="code-editor-header">
+            <span>💻 Alex wants a code answer for this one</span>
+            <select id="codeLanguage">
+                <option value="python">Python</option>
+                <option value="javascript">JavaScript</option>
+                <option value="java">Java</option>
+                <option value="cpp">C++</option>
+                <option value="c">C</option>
+            </select>
+        </div>
+        <textarea id="codeInput" class="code-input" placeholder="// write your solution here" spellcheck="false"></textarea>
+        <button onclick="submitCode()">Submit Code →</button>
     </div>
 
 </section>
