@@ -1,6 +1,7 @@
 let accessToken = null;
 let conversationId = null;
 let questionCount = 1;
+let selectedRole = null;
 
 // Run on page load: enforce login, wire up the landing button, then
 // restore the most recent conversation (if any)
@@ -9,9 +10,23 @@ let questionCount = 1;
     if (!accessToken) return; // requireSession already redirected to /login
 
     document.getElementById("startBtn").addEventListener("click", () => {
+        const roleValue = document.getElementById("roleSelect").value;
+        const customRole = document.getElementById("customRoleInput").value.trim();
+        selectedRole = roleValue === "Other" && customRole ? customRole : roleValue;
+
         document.getElementById("landing").style.display = "none";
         document.getElementById("interview").classList.remove("hidden");
         startTimer();
+    });
+
+    document.getElementById("roleSelect").addEventListener("change", (e) => {
+        const customInput = document.getElementById("customRoleInput");
+        if (e.target.value === "Other") {
+            customInput.classList.remove("hidden");
+            customInput.focus();
+        } else {
+            customInput.classList.add("hidden");
+        }
     });
 
     toggleCodeEditor(false);
@@ -252,7 +267,8 @@ async function sendPromptText(text) {
         },
         body: JSON.stringify({
             prompt: text,
-            conversation_id: conversationId
+            conversation_id: conversationId,
+            target_role: selectedRole
         })
     });
 

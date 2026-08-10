@@ -59,6 +59,52 @@ body{
     font-size:18px;
 }
 
+.role-select-wrapper{
+    margin-top:30px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+}
+
+.role-select-wrapper label{
+    color:#c9d9e6;
+    font-size:15px;
+}
+
+.role-select-wrapper select{
+    padding:10px 20px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.25);
+    background:rgba(1,18,54,0.6);
+    color:white;
+    font-size:15px;
+    min-width:260px;
+    cursor:pointer;
+}
+
+.role-select-wrapper select:focus{
+    outline:2px solid #2D9CDB;
+}
+
+.role-select-wrapper input{
+    padding:10px 20px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.25);
+    background:rgba(1,18,54,0.6);
+    color:white;
+    font-size:15px;
+    min-width:260px;
+}
+
+.role-select-wrapper input:focus{
+    outline:2px solid #2D9CDB;
+}
+
+.role-select-wrapper input::placeholder{
+    color:#8fa3b8;
+}
+
 #startBtn{
     padding:18px 45px;
     border:none;

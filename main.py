@@ -25,6 +25,7 @@ client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 class PromptRequest(BaseModel):
     prompt: str
     conversation_id: str | None = None  # if None, we create a new conversation
+    target_role: str | None = None      # only used when creating a new conversation
 
 
 # ---------- Pages ----------
@@ -45,14 +46,25 @@ async def login_page(request: Request):
 async def generate(data: PromptRequest, user=Depends(get_current_user)):
 
     conversation_id = data.conversation_id
+    target_role = data.target_role
 
     # Create a conversation if this is the first message
     if not conversation_id:
         conv = supabase.table("conversations").insert({
             "user_id": user.id,
             "title": data.prompt[:60],
+            "target_role": target_role,
         }).execute()
         conversation_id = conv.data[0]["id"]
+    else:
+        # Continuing an existing conversation — pull the role that was set
+        # when it was created, so every turn stays aware of it, not just the first.
+        conv_rows = supabase.table("conversations") \
+            .select("target_role") \
+            .eq("id", conversation_id) \
+            .limit(1) \
+            .execute().data
+        target_role = conv_rows[0]["target_role"] if conv_rows else None
 
     # Pull prior turns so the model has context
     history_rows = supabase.table("messages") \
@@ -203,6 +215,7 @@ Keep it valid JSON. recommendation must be exactly one of: "Strong Hire", "Hire"
     """
 
     resume_text = f"\nCandidate resume summary: {resume_context}\n" if resume_context else ""
+    role_text = f"\nThe candidate has stated they are interviewing for this specific role: {target_role}. Tailor Alex's technical questions and Ricky's behavioral questions to be relevant to this role.\n" if target_role else ""
 
     # Explicit turn-tracking state — the model can't reliably self-count
     # turns once follow-ups are mixed in, so we tell it directly.
@@ -216,7 +229,7 @@ You MUST NOT ask any further questions. Respond ONLY with: a warm closing messag
 STATE: This message is your response following the candidate's answer #{current_answer_number} of 11 total. Continue the interview per the structure and speaker rotation above. Do not conclude or produce a scorecard yet — there are more questions remaining.
 """
 
-    system_instruction = SYSTEM_PROMPT + resume_text + state_instruction
+    system_instruction = SYSTEM_PROMPT + resume_text + role_text + state_instruction
 
     # Convert our stored messages into Gemini's Content objects.
     # Gemini's chat API uses role "model" for the assistant, not "bot".
