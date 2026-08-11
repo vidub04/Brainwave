@@ -21,19 +21,19 @@ async function signIn() {
         document.getElementById("authMsg").textContent = error.message;
         return;
     }
-    window.location.href = "/";
+    window.location.href = "/app";
 }
 
 async function signOut() {
     await supabaseClient.auth.signOut();
-    window.location.href = "/login";
+    window.location.href = "/";
 }
 
 // Returns the current access token, or redirects to /login if there isn't one.
 async function requireSession() {
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
-        window.location.href = "/login";
+        window.location.href = "/";
         return null;
     }
     return session.access_token;

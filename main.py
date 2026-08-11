@@ -31,18 +31,18 @@ class PromptRequest(BaseModel):
 # ---------- Pages ----------
 
 @app.get("/", response_class=HTMLResponse)
+async def login_window(request: Request):
+    return templates.TemplateResponse(request, "login.html")
+
+
+@app.get("/app", response_class=HTMLResponse)
 async def home(request: Request):
     return templates.TemplateResponse(request, "index.html")
 
 
-@app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
-    return templates.TemplateResponse(request, "login.html")
-
-
 # ---------- Chat ----------
 
-@app.post("/generate")
+@app.post("/app/generate")
 async def generate(data: PromptRequest, user=Depends(get_current_user)):
 
     conversation_id = data.conversation_id
@@ -274,7 +274,7 @@ STATE: This message is your response following the candidate's answer #{current_
 
 # ---------- History ----------
 
-@app.get("/conversations")
+@app.get("/app/conversations")
 async def list_conversations(user=Depends(get_current_user)):
     rows = supabase.table("conversations") \
         .select("id, title, created_at") \
@@ -284,7 +284,7 @@ async def list_conversations(user=Depends(get_current_user)):
     return {"conversations": rows}
 
 
-@app.get("/history/{conversation_id}")
+@app.get("/app/history/{conversation_id}")
 async def get_history(conversation_id: str, user=Depends(get_current_user)):
     rows = supabase.table("messages") \
         .select("role, content, created_at") \
@@ -297,7 +297,7 @@ async def get_history(conversation_id: str, user=Depends(get_current_user)):
 
 # ---------- Resume ----------
 
-@app.post("/resume/upload")
+@app.post("/app/resume/upload")
 async def upload_resume(file: UploadFile = File(...), user=Depends(get_current_user)):
     if not file.filename.lower().endswith((".pdf", ".docx")):
         raise HTTPException(status_code=400, detail="Only .pdf or .docx files are supported")
