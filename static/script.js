@@ -31,7 +31,7 @@ let selectedRole = null;
 
     toggleCodeEditor(false);
 
-    const res = await fetch("/conversations", {
+    const res = await fetch("/app/conversations", {
         headers: { "Authorization": `Bearer ${accessToken}` }
     });
     const data = await res.json();
@@ -54,7 +54,7 @@ function startTimer() {
 }
 
 async function loadHistory(id) {
-    const res = await fetch(`/history/${id}`, {
+    const res = await fetch(`/app/history/${id}`, {
         headers: { "Authorization": `Bearer ${accessToken}` }
     });
     const data = await res.json();
@@ -259,7 +259,7 @@ async function sendPromptText(text) {
     appendMessage("user", text);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    const res = await fetch("/generate", {
+    const res = await fetch("/app/generate", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -273,7 +273,7 @@ async function sendPromptText(text) {
     });
 
     if (res.status === 401) {
-        window.location.href = "/login";
+        window.location.href = "/";
         return;
     }
 
@@ -295,7 +295,7 @@ async function uploadResume() {
     const formData = new FormData();
     formData.append("file", file);
 
-    const res = await fetch("/resume/upload", {
+    const res = await fetch("/app/resume/upload", {
         method: "POST",
         headers: { "Authorization": `Bearer ${accessToken}` },
         body: formData
