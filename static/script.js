@@ -5,6 +5,136 @@ let selectedRole = null;
 
 // Run on page load: enforce login, wire up the landing button, then
 // restore the most recent conversation (if any)
+
+async function init() {
+
+    await supabaseReady;
+
+    accessToken = await requireSession();
+
+    if (!accessToken) return;
+
+
+    // -----------------------------
+    // Start Interview Button
+    // -----------------------------
+
+    document.getElementById("startBtn").addEventListener("click", async () => {
+
+        const roleValue =
+            document.getElementById("roleSelect").value;
+
+        const customRole =
+            document.getElementById("customRoleInput").value.trim();
+
+        selectedRole =
+            roleValue === "Other" && customRole
+                ? customRole
+                : roleValue;
+
+
+        // Create a NEW interview session
+        const res = await fetch("/app/conversations", {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+            },
+
+            body: JSON.stringify({
+                role: selectedRole
+            })
+        });
+
+
+        if (!res.ok) {
+
+            const error = await res.text();
+
+            console.error(
+                "Failed to create conversation:",
+                error
+            );
+
+            return;
+        }
+
+
+        const data = await res.json();
+
+
+        // Store NEW conversation ID
+        conversationId = data.conversation_id;
+
+
+        // -----------------------------
+        // Reset interview UI
+        // -----------------------------
+
+        const chatBox =
+            document.getElementById("chatBox");
+
+        chatBox.innerHTML = "";
+
+
+        // Reset question count
+        questionCount = 0;
+
+        document.getElementById("questionNo").innerText =
+            "Question 0 / 11";
+
+
+        // -----------------------------
+        // Open interview screen
+        // -----------------------------
+
+        document.getElementById("landing").style.display =
+            "none";
+
+        document.getElementById("interview").classList.remove(
+            "hidden"
+        );
+
+
+        // Start timer
+        startTimer();
+
+    });
+
+
+    // -----------------------------
+    // Role selector
+    // -----------------------------
+
+    document.getElementById("roleSelect")
+        .addEventListener("change", (e) => {
+
+            const customInput =
+                document.getElementById("customRoleInput");
+
+            if (e.target.value === "Other") {
+
+                customInput.classList.remove("hidden");
+
+                customInput.focus();
+
+            } else {
+
+                customInput.classList.add("hidden");
+
+            }
+
+        });
+
+
+    toggleCodeEditor(false);
+}
+
+
+init();
+
+/*
 (async function init() {
 
     await supabaseReady;
@@ -47,7 +177,7 @@ let selectedRole = null;
         await loadHistory(conversationId);
     }
 
-    */
+    
 
     
     // Create a NEW interview session
@@ -78,15 +208,17 @@ let selectedRole = null;
         "Question 0 / 11";
 
     // Show interview screen
-    /*
+    
     document.getElementById("landing").style.display = "none";
     document.getElementById("interview").classList.remove("hidden");
 
     startTimer();
 
-    */
+    
 
 })();
+
+*/
 
 function startTimer() {
     let seconds = 0;
