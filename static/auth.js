@@ -1,11 +1,28 @@
-/*new files */
+/*new files 
 const config = await fetch("/config").then(res => res.json());
 
 const SUPABASE_URL = config.supabase_url;
 const SUPABASE_ANON_KEY = config.supabase_anon_key;
 
+*/
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+async function create_client() {
+
+    const res = await fetch("/config");
+    const data = await res.json();
+
+    const supabaseClient = window.supabase.createClient(
+        data.supabase_url,
+        data.supabase_anon_key
+    );
+
+  
+}
+
+
+/*const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);*/
+
+create_client()
 
 async function signUp() {
     const email = document.getElementById("email").value;
