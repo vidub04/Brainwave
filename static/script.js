@@ -6,6 +6,8 @@ let selectedRole = null;
 // Run on page load: enforce login, wire up the landing button, then
 // restore the most recent conversation (if any)
 (async function init() {
+
+    await supabaseReady;
     accessToken = await requireSession();
     if (!accessToken) return; // requireSession already redirected to /login
 

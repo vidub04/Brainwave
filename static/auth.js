@@ -18,13 +18,15 @@ async function create_client() {
         data.supabase_anon_key
     );
 
+    console.log("Supabase initialized");
+
   
 }
 
 
 /*const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);*/
 
-create_client()
+const supabaseReady=create_client();
 
 async function signUp() {
     const email = document.getElementById("email").value;
