@@ -443,16 +443,48 @@ body.login-page {
     align-items: center;
 }
 
-.login-container {
-    width: 400px;
-    min-height: 350px;
-    padding: 32px;
+/* =========================
+   LOGIN PAGE - CENTERED BOX
+   ========================= */
 
-    background: #1f2937;
-    border-radius: 18px;
+body.login-page {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-height: 100vh !important;
 
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
 
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+#login-container {
+    /* Size */
+    width: 400px !important;
+    height: auto !important;
+    min-height: 350px !important;
+
+    /* Remove any existing container positioning */
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+
+    transform: translate(-50%, -50%) !important;
+
+    /* Appearance */
+    padding: 32px !important;
+    margin: 0 !important;
+
+    background: #1f2937 !important;
+    border-radius: 18px !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35) !important;
 }
