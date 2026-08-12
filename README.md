@@ -1,6 +1,6 @@
-# 🧠 Interview Brainwave
+#RoleReady
 
-Interview Brainwave is an AI-powered mock interview application that simulates realistic technical and HR interviews through two unique AI interviewer personalities.
+RoleReady is an AI-powered mock interview application that simulates realistic technical and HR interviews through two unique AI interviewer personalities.
 
 Whether you're preparing for internships, placements, or software engineering roles, the application conducts an interactive interview by asking role-specific questions, adapting to your responses, and personalizing questions using your resume.
 
@@ -151,7 +151,7 @@ Visit `http://localhost:8000` to log in or sign up, then you'll be redirected to
 
 # 🗄️ Database Schema
 
-Interview Brainwave uses **Supabase (PostgreSQL)** to persist user interviews, chat history, and resume information. The database is designed so each user has isolated data while allowing conversations to be resumed and personalized.
+RoleReady uses **Supabase (PostgreSQL)** to persist user interviews, chat history, and resume information. The database is designed so each user has isolated data while allowing conversations to be resumed and personalized.
 
 ---
 
@@ -225,7 +225,7 @@ Example structure:
   "education": "...",
   "projects": [
     {
-      "title": "Interview Brainwave",
+      "title": "RoleReady",
       "technologies": ["FastAPI", "Gemini", "Supabase"]
     }
   ]
@@ -344,4 +344,4 @@ Although the FastAPI backend typically uses the **Supabase Service Role Key**, w
 
 ## 🎯 Project Goal
 
-Interview Brainwave aims to make interview preparation more interactive and personalized by simulating realistic conversations rather than presenting a fixed list of questions. The application adapts to the candidate's responses, encouraging critical thinking while helping users improve both technical knowledge and communication skills.
+RoleReady aims to make interview preparation more interactive and personalized by simulating realistic conversations rather than presenting a fixed list of questions. The application adapts to the candidate's responses, encouraging critical thinking while helping users improve both technical knowledge and communication skills.
