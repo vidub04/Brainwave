@@ -28,7 +28,7 @@ class PromptRequest(BaseModel):
     target_role: str | None = None      # only used when creating a new conversation
 
 class ConversationRequest(BaseModel):
-    role: str = "Interview"
+    role: str  | None = "Interview"
 
 
 # ---------- Pages ----------
