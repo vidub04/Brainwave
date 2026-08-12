@@ -6,7 +6,7 @@ const SUPABASE_ANON_KEY = config.supabase_anon_key;
 
 */
 
-const supabaseClient=null
+let supabaseClient=null
 
 async function create_client() {
 
