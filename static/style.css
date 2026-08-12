@@ -1,30 +1,43 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    width: 100%;
-    min-height:100%;
-    font-family:Segoe UI,sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+    font-family: "Segoe UI", sans-serif;
 }
 
-body{
-    background:linear-gradient(135deg,#1D1F20,#0A74DA,#2D9CDB,#0EBB8A,#A9D8D5);
-    min-height:100vh;
-    color:white;
+body {
+    margin: 0;
+
+    background: linear-gradient(
+        135deg,
+        #1D1F20,
+        #0A74DA,
+        #2D9CDB,
+        #0EBB8A,
+        #A9D8D5
+    );
+
+    min-height: 100vh;
+    color: white;
 }
+
 
 /* ---------- Landing ---------- */
 
-.landing{
-    width:100%;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    box-sizing: border-box;
-    padding:30px;
-    /*height:100vh;*/
+.landing {
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 30px;
 }
+
+
+/* ---------- Hero Card ---------- */
 
 .hero {
     width: 900px;
@@ -33,19 +46,19 @@ body{
     padding: 60px;
 
     text-align: center;
+
     border-radius: 28px;
 
     background: rgba(1, 18, 54, 0.72);
+
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 
     border: 1px solid rgba(255, 255, 255, 0.18);
 
     box-shadow:
-        0 20px 60px rgba(0, 0, 0, .25),
-        inset 0 1px 1px rgba(255, 255, 255, .15);
-
-    box-sizing: border-box;
+        0 20px 60px rgba(0, 0, 0, 0.25),
+        inset 0 1px 1px rgba(255, 255, 255, 0.15);
 }
 
 /*
