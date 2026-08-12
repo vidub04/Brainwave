@@ -16,9 +16,11 @@ let selectedRole = null;
         const customRole = document.getElementById("customRoleInput").value.trim();
         selectedRole = roleValue === "Other" && customRole ? customRole : roleValue;
 
+        /*
         document.getElementById("landing").style.display = "none";
         document.getElementById("interview").classList.remove("hidden");
         startTimer();
+        */
     });
 
     document.getElementById("roleSelect").addEventListener("change", (e) => {
@@ -33,6 +35,8 @@ let selectedRole = null;
 
     toggleCodeEditor(false);
 
+    /*old code for viewing history of interviews
+    
     const res = await fetch("/app/conversations", {
         headers: { "Authorization": `Bearer ${accessToken}` }
     });
@@ -42,6 +46,43 @@ let selectedRole = null;
         conversationId = data.conversations[0].id;
         await loadHistory(conversationId);
     }
+
+    */
+
+    
+    // Create a NEW interview session
+    const res = await fetch("/app/conversations", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+        },
+        body: JSON.stringify({
+            role: selectedRole
+        })
+    });
+
+    const data = await res.json();
+
+    // Store the NEW conversation ID
+    conversationId = data.conversation_id;
+
+    // Clear previous chat from UI
+    const chatBox = document.getElementById("chatBox");
+    chatBox.innerHTML = "";
+
+    // Reset interview state
+    questionCount = 0;
+
+    document.getElementById("questionNo").innerText =
+        "Question 0 / 11";
+
+    // Show interview screen
+    document.getElementById("landing").style.display = "none";
+    document.getElementById("interview").classList.remove("hidden");
+
+    startTimer();
+
 })();
 
 function startTimer() {
