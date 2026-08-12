@@ -6,12 +6,14 @@ const SUPABASE_ANON_KEY = config.supabase_anon_key;
 
 */
 
+const supabaseClient=null
+
 async function create_client() {
 
     const res = await fetch("/config");
     const data = await res.json();
 
-    const supabaseClient = window.supabase.createClient(
+    supabaseClient = window.supabase.createClient(
         data.supabase_url,
         data.supabase_anon_key
     );
