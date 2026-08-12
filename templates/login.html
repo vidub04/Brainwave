@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body>
+
+<body class="login-page">
 
 <div class="login-container">
 
@@ -18,12 +19,18 @@
     <div style="display:flex; flex-direction:column; gap:12px;">
         <input id="email" type="email" placeholder="Email"
                style="padding:10px; border-radius:8px; border:1px solid #374151; background:#111827; color:white;">
+
         <input id="password" type="password" placeholder="Password"
                style="padding:10px; border-radius:8px; border:1px solid #374151; background:#111827; color:white;">
 
         <div style="display:flex; gap:8px;">
-            <button onclick="signIn()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer;">Log In</button>
-            <button onclick="signUp()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#374151; color:white; cursor:pointer;">Sign Up</button>
+            <button onclick="signIn()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#2563eb; color:white; cursor:pointer;">
+                Log In
+            </button>
+
+            <button onclick="signUp()" style="flex:1; padding:10px; border-radius:8px; border:none; background:#374151; color:white; cursor:pointer;">
+                Sign Up
+            </button>
         </div>
 
         <p id="authMsg" style="color:#f87171; font-size:14px; min-height:20px;"></p>
@@ -33,5 +40,6 @@
 
 <script src="/static/config.js"></script>
 <script src="/static/auth.js"></script>
+
 </body>
 </html>
