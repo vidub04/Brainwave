@@ -1,3 +1,4 @@
+/*new files */
 const config = await fetch("/config").then(res => res.json());
 
 const SUPABASE_URL = config.supabase_url;
