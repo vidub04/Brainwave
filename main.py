@@ -40,6 +40,15 @@ async def home(request: Request):
     return templates.TemplateResponse(request, "index.html")
 
 
+# ---------- Login Cred ----------
+@app.get("/config")
+async def get_config():
+    return {
+        "supabase_url": os.getenv("SUPABASE_URL"),
+        "supabase_anon_key": os.getenv("SUPABASE_ANON_KEY")
+    }
+
+
 # ---------- Chat ----------
 
 @app.post("/app/generate")
@@ -88,6 +97,8 @@ async def generate(data: PromptRequest, user=Depends(get_current_user)):
     prior_user_answers = sum(1 for h in history_rows if h["role"] == "user")
     current_answer_number = prior_user_answers + 1
     should_conclude = current_answer_number >= 11
+
+    ##prompt definition
 
     SYSTEM_PROMPT = """
 

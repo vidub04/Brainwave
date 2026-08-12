@@ -1,3 +1,9 @@
+const config = await fetch("/config").then(res => res.json());
+
+const SUPABASE_URL = config.supabase_url;
+const SUPABASE_ANON_KEY = config.supabase_anon_key;
+
+
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function signUp() {
