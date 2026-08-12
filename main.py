@@ -27,6 +27,9 @@ class PromptRequest(BaseModel):
     conversation_id: str | None = None  # if None, we create a new conversation
     target_role: str | None = None      # only used when creating a new conversation
 
+class ConversationRequest(BaseModel):
+    role: str = "Interview"
+
 
 # ---------- Pages ----------
 
@@ -285,6 +288,25 @@ STATE: This message is your response following the candidate's answer #{current_
 
 # ---------- History ----------
 
+@app.post("/app/conversations")
+async def create_conversation(
+    data: ConversationRequest,
+    user=Depends(get_current_user)
+):
+    result = supabase.table("conversations").insert({
+        "user_id": user.id,
+        "title": data.role
+    }).execute()
+
+    conversation = result.data[0]
+
+    return {
+        "conversation_id": conversation["id"]
+    }
+
+
+'''
+
 @app.get("/app/conversations")
 async def list_conversations(user=Depends(get_current_user)):
     rows = supabase.table("conversations") \
@@ -294,7 +316,7 @@ async def list_conversations(user=Depends(get_current_user)):
         .execute().data
     return {"conversations": rows}
 
-
+'''
 @app.get("/app/history/{conversation_id}")
 async def get_history(conversation_id: str, user=Depends(get_current_user)):
     rows = supabase.table("messages") \
