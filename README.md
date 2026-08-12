@@ -24,12 +24,15 @@ Whether you're preparing for internships, placements, or software engineering ro
   * Asks one question at a time.
   * Generates follow-up questions based on previous answers.
   * Interview wraps up automatically after ~10 candidate answers.
+  * Increasing difficulty on basis of performance
+  * Weak topic suggestion
 
 * 🎯 **Role-Based Interviewing**
 
   * Candidate selects a target role at the start of the interview.
   * Tailors both Alex's technical questions and Ricky's behavioral questions to that role.
   * The selected role is remembered for the rest of that conversation.
+  * Coding section
 
 * 📄 **Resume Upload & Personalization**
 
@@ -65,6 +68,7 @@ Whether you're preparing for internships, placements, or software engineering ro
 * 🖥️ **Chatbot-Style Interface**
 
   * Clean conversational UI inspired by modern AI chat applications.
+    
 
 ---
 
@@ -326,17 +330,13 @@ Although the FastAPI backend typically uses the **Supabase Service Role Key**, w
 
 * Voice-based interview with speech-to-text
 * AI voice responses using text-to-speech
-* Detailed performance report with scores
 * Support for more roles, domains, and engineering branches
 * Company-specific interview modes
-* Adaptive interview difficulty based on candidate performance
 * Communication & English analysis
 * Video-based interviews
 * AI coach
 * Feedback with improved answers
-* Coding section
 * System design section
-* Weak topic detection
 * Recommended questions & resources
 * Generate study plan
 
