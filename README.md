@@ -1,4 +1,4 @@
-#RoleReady
+# RoleReady
 
 RoleReady is an AI-powered mock interview application that simulates realistic technical and HR interviews through two unique AI interviewer personalities.
 
