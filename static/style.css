@@ -10,27 +10,7 @@ body{
     min-height:100vh;
     color:white;
 }
-/* ---------- Login Page ---------- */
 
-.login-container {
-    width: 400px;
-    min-height: 350px;
-    padding: 32px;
-
-    background: #1f2937;
-    border-radius: 18px;
-
-    display: flex;
-    flex-direction: column;
-
-    /* Center horizontally and vertically */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
 /* ---------- Landing ---------- */
 
 .landing{
@@ -451,4 +431,28 @@ button:hover{
     margin-top:10px;
     width:auto;
     padding:8px 18px;
+}
+/* ---------- Login Page ---------- */
+
+body.login-page {
+    min-height: 100vh;
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-container {
+    width: 400px;
+    min-height: 350px;
+    padding: 32px;
+
+    background: #1f2937;
+    border-radius: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
