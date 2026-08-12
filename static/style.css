@@ -6,6 +6,10 @@
     font-family: "Segoe UI", sans-serif;
 }
 
+#interview {
+    display: none !important;
+}
+
 body {
     margin: 0;
 
