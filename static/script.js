@@ -16,11 +16,11 @@ let selectedRole = null;
         const customRole = document.getElementById("customRoleInput").value.trim();
         selectedRole = roleValue === "Other" && customRole ? customRole : roleValue;
 
-        /*
+        
         document.getElementById("landing").style.display = "none";
         document.getElementById("interview").classList.remove("hidden");
         startTimer();
-        */
+        
     });
 
     document.getElementById("roleSelect").addEventListener("change", (e) => {
@@ -78,10 +78,13 @@ let selectedRole = null;
         "Question 0 / 11";
 
     // Show interview screen
+    /*
     document.getElementById("landing").style.display = "none";
     document.getElementById("interview").classList.remove("hidden");
 
     startTimer();
+
+    */
 
 })();
 
