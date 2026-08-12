@@ -107,6 +107,7 @@ body{
 
 #startBtn{
     padding:18px 45px;
+    width:120px;
     border:none;
     border-radius:50px;
     background:linear-gradient(90deg,#040860,#1865c2);
