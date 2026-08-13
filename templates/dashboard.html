@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Progress · RoleReady</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<section id="dashboard" class="dashboard">
+    <header class="dashboard-header">
+        <div class="logo">📊 Your Progress</div>
+        <a href="/app" class="back-link">← Back to Interviews</a>
+    </header>
+
+    <div id="dashboardContent" class="dashboard-content">
+        <p id="emptyState" class="empty-state hidden">
+            No completed interviews yet — finish your first full session to start tracking progress here.
+        </p>
+
+        <div id="summaryRow" class="summary-row hidden"></div>
+
+        <div id="chartCard" class="chart-card hidden">
+            <h3>Score trend across sessions</h3>
+            <svg id="trendChart" viewBox="0 0 900 320" class="trend-chart"></svg>
+            <div id="chartLegend" class="chart-legend"></div>
+        </div>
+
+        <div id="sessionTable" class="session-table hidden">
+            <h3>Past interviews</h3>
+            <div id="sessionRows"></div>
+        </div>
+    </div>
+</section>
+
+<script src="/static/config.js"></script>
+<script src="/static/auth.js"></script>
+<script src="/static/dashboard.js"></script>
+</body>
+</html>

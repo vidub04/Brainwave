@@ -41,50 +41,67 @@
 </section>
 
 <!-- Interview Screen (auth-gated, starts hidden) -->
-<section id="interview" class="hidden">
+<section id="interview" class="hidden interview-layout">
 
-    <header>
-        <div class="logo">🤖 RoleReady</div>
-
-        <div class="stats">
-            <span id="questionNo">Question 1 / 11</span>
-            <span>⏱️ <span id="timer">00:00</span></span>
-            <span id="difficultyBadge">➖ Difficulty: Steady</span>
-            <label for="resumeInput" style="cursor:pointer;">📄 Upload resume</label>
-            <input id="resumeInput" type="file" accept=".pdf,.docx" style="display:none;" onchange="uploadResume()">
-            <button onclick="signOut()" style="width:auto; padding:6px 10px;">Log out</button>
+    <aside id="historySidebar" class="history-sidebar">
+        <button id="newInterviewBtn" class="new-interview-btn">+ New Interview</button>
+        <div class="sidebar-title">Past Interviews</div>
+        <div id="conversationList" class="conversation-list">
+            <p class="sidebar-empty">No interviews yet</p>
         </div>
-    </header>
+    </aside>
 
-    <div class="chat-box" id="chatBox">
-        <div class="message bot">
-            <div class="avatar">🤖</div>
-            <div class="bubble">
-                Welcome! I'll be your interviewer today.
-                <br><br>
-                Please introduce yourself and tell me the role you're applying for.
+    <div class="interview-main">
+
+        <header>
+            <div class="logo">🤖 RoleReady</div>
+
+            <div class="stats">
+                <span id="questionNo">Question 1 / 11</span>
+                <span>⏱️ <span id="timer">00:00</span></span>
+                <span id="difficultyBadge">➖ Difficulty: Steady</span>
+                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" title="Mute/unmute interviewer voice" style="width:auto; padding:6px 10px;">🔇 Voice</button>
+                <label for="resumeInput" style="cursor:pointer;">📄 Upload resume</label>
+                <input id="resumeInput" type="file" accept=".pdf,.docx" style="display:none;" onchange="uploadResume()">
+                <button onclick="signOut()" style="width:auto; padding:6px 10px;">Log out</button>
+            </div>
+        </header>
+
+        <div class="progress-bar-track">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+
+        <div class="chat-box" id="chatBox">
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    Welcome! I'll be your interviewer today.
+                    <br><br>
+                    Please introduce yourself and tell me the role you're applying for.
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="input-area">
-        <textarea id="prompt" placeholder="Type your answer..."></textarea>
-        <button id="sendTextBtn" onclick="sendPrompt()">Send →</button>
-    </div>
-
-    <div id="codeEditorPanel" class="code-editor-panel hidden">
-        <div class="code-editor-header">
-            <span>💻 Alex wants a code answer for this one</span>
-            <select id="codeLanguage">
-                <option value="python">Python</option>
-                <option value="javascript">JavaScript</option>
-                <option value="java">Java</option>
-                <option value="cpp">C++</option>
-                <option value="c">C</option>
-            </select>
+        <div class="input-area">
+            <textarea id="prompt" placeholder="Type your answer..."></textarea>
+            <button id="sendTextBtn" onclick="sendPrompt()">Send →</button>
         </div>
-        <textarea id="codeInput" class="code-input" placeholder="// write your solution here" spellcheck="false"></textarea>
-        <button onclick="submitCode()">Submit Code →</button>
+
+        <div id="codeEditorPanel" class="code-editor-panel hidden">
+            <div class="code-editor-header">
+                <span>💻 Alex wants a code answer for this one</span>
+                <select id="codeLanguage">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="c">C</option>
+                </select>
+            </div>
+            <textarea id="codeInput" class="code-input" placeholder="// write your solution here" spellcheck="false"></textarea>
+            <button onclick="submitCode()">Submit Code →</button>
+        </div>
+
     </div>
 
 </section>

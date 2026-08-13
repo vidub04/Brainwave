@@ -2,6 +2,8 @@ let accessToken = null;
 let conversationId = null;
 let questionCount = 1;
 let selectedRole = null;
+let timerInterval = null;
+let voiceOutputEnabled = false;
 
 // Run on page load: enforce login, wire up the landing button, then
 // restore the most recent conversation (if any)
@@ -84,6 +86,8 @@ async function init() {
         document.getElementById("questionNo").innerText =
             "Question 0 / 11";
 
+        updateProgressBar();
+
 
         // -----------------------------
         // Open interview screen
@@ -99,6 +103,9 @@ async function init() {
 
         // Start timer
         startTimer();
+
+        // Refresh the sidebar so the new interview shows up immediately
+        await loadConversationList();
 
     });
 
@@ -129,6 +136,17 @@ async function init() {
 
 
     toggleCodeEditor(false);
+
+    // -----------------------------
+    // Chat history sidebar
+    // -----------------------------
+
+    document.getElementById("newInterviewBtn").addEventListener("click", () => {
+        document.getElementById("interview").classList.add("hidden");
+        document.getElementById("landing").style.display = "flex";
+    });
+
+    await loadConversationList();
 }
 
 
@@ -221,14 +239,74 @@ init();
 */
 
 function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
     let seconds = 0;
-    setInterval(() => {
+    document.getElementById("timer").innerText = "00:00";
+    timerInterval = setInterval(() => {
         seconds++;
         const min = Math.floor(seconds / 60);
         const sec = seconds % 60;
         document.getElementById("timer").innerText =
             `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
     }, 1000);
+}
+
+// ---------- Chat history sidebar ----------
+
+async function loadConversationList() {
+    const listEl = document.getElementById("conversationList");
+    if (!listEl) return;
+
+    const res = await fetch("/app/conversations", {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const conversations = data.conversations || [];
+
+    if (conversations.length === 0) {
+        listEl.innerHTML = `<p class="sidebar-empty">No interviews yet</p>`;
+        return;
+    }
+
+    listEl.innerHTML = conversations.map(c => {
+        const label = c.target_role || c.title || "Interview";
+        const date = c.created_at
+            ? new Date(c.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })
+            : "";
+        const activeClass = c.id === conversationId ? "active" : "";
+        return `
+        <div class="conversation-item ${activeClass}" data-id="${c.id}" data-role="${label}">
+            <div class="conversation-item-title">${label}</div>
+            <div class="conversation-item-date">${date}</div>
+        </div>`;
+    }).join("");
+
+    listEl.querySelectorAll(".conversation-item").forEach(item => {
+        item.addEventListener("click", () => {
+            resumeConversation(item.dataset.id, item.dataset.role);
+        });
+    });
+}
+
+async function resumeConversation(id, role) {
+    conversationId = id;
+    selectedRole = role;
+    questionCount = 0;
+
+    const chatBox = document.getElementById("chatBox");
+    chatBox.innerHTML = "";
+
+    document.getElementById("landing").style.display = "none";
+    document.getElementById("interview").classList.remove("hidden");
+
+    await loadHistory(id);
+    startTimer();
+
+    document.querySelectorAll(".conversation-item").forEach(item => {
+        item.classList.toggle("active", item.dataset.id === id);
+    });
 }
 
 async function loadHistory(id) {
@@ -246,6 +324,7 @@ async function loadHistory(id) {
         }
     });
     document.getElementById("questionNo").innerText = `Question ${questionCount} / 11`;
+    updateProgressBar();
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -275,6 +354,8 @@ function appendMessage(role, text) {
         if (parsed.scorecard) {
             renderScorecard(parsed.scorecard);
         }
+
+        speakText(parsed.message, parsed.speaker);
 
         toggleCodeEditor(parsed.codeRequired === true);
         return;
@@ -345,6 +426,46 @@ function updateDifficultyBadge(difficulty) {
         easing: "🔻 Difficulty: Easing",
     };
     badge.innerText = labels[difficulty] || "Difficulty: Steady";
+}
+
+// ---------- Voice output (mutable — off by default) ----------
+
+function toggleVoiceOutput() {
+    voiceOutputEnabled = !voiceOutputEnabled;
+    const btn = document.getElementById("voiceToggleBtn");
+    if (btn) btn.innerText = voiceOutputEnabled ? "🔊 Voice" : "🔇 Voice";
+    if (!voiceOutputEnabled && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+    }
+}
+
+function speakText(text, speaker) {
+    if (!voiceOutputEnabled || !window.speechSynthesis) return;
+    if (!text || !text.trim()) return;
+
+    window.speechSynthesis.cancel(); // don't stack overlapping utterances
+    const utterance = new SpeechSynthesisUtterance(text);
+
+    // Distinct pitch/rate per persona so Alex and Ricky sound different,
+    // without depending on browser-specific voice lists being available.
+    if (speaker === "Ricky") {
+        utterance.pitch = 1.3;
+        utterance.rate = 1.02;
+    } else {
+        utterance.pitch = 0.85;
+        utterance.rate = 0.98;
+    }
+
+    window.speechSynthesis.speak(utterance);
+}
+
+// ---------- Progress bar (mirrors "Question X / 11") ----------
+
+function updateProgressBar() {
+    const fill = document.getElementById("progressBarFill");
+    if (!fill) return;
+    const pct = Math.min(100, Math.max(0, (questionCount / 11) * 100));
+    fill.style.width = `${pct}%`;
 }
 
 function toggleCodeEditor(show) {
@@ -463,6 +584,7 @@ async function sendPromptText(text) {
 
     questionCount = Math.min(questionCount + 1, 11);
     document.getElementById("questionNo").innerText = `Question ${questionCount} / 11`;
+    updateProgressBar();
 }
 
 async function uploadResume() {

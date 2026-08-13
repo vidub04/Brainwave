@@ -317,6 +317,16 @@ async def list_conversations(user=Depends(get_current_user)):
     return {"conversations": rows}
 
 '''
+@app.get("/app/conversations")
+async def list_conversations(user=Depends(get_current_user)):
+    rows = supabase.table("conversations") \
+        .select("id, title, target_role, created_at") \
+        .eq("user_id", user.id) \
+        .order("created_at", desc=True) \
+        .execute().data
+    return {"conversations": rows}
+
+
 @app.get("/app/history/{conversation_id}")
 async def get_history(conversation_id: str, user=Depends(get_current_user)):
     rows = supabase.table("messages") \
