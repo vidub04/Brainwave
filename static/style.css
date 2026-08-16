@@ -106,14 +106,10 @@ body{
 }
 
 #startBtn{
-    padding:18px 45px;
-    border:none;
-    border-radius:50px;
-    background:linear-gradient(90deg,#040860,#1865c2);
-    color:white;
-    font-size:18px;
-    cursor:pointer;
-    transition:.3s;
+    padding:16px 40px;
+    white-space:nowrap;      /* ADD — stops text from wrapping */
+    border-radius:12px;      /* CHANGE from 50px — full pill exaggerates the wrap into a circle */
+    /* keep your existing background, color, font-size, cursor, transition as-is */
 }
 
 #startBtn:hover{
