@@ -1,439 +1,476 @@
 let accessToken = null;
-let conversationId = null;
-let questionCount = 1;
-let selectedRole = null;
+let interviewId = null;
+let selectedRole = "Machine Learning Engineer";
+let targetDuration = 30;
+let totalQuestions = 8;
+let currentQuestionIndex = 0;
 let timerInterval = null;
 let voiceOutputEnabled = false;
+let uploadedResumeText = "";
+let uploadedResumeStructured = null;
+let isRecordingVoice = false;
+let speechRecognizer = null;
+let isCodeEditorOpen = false;
 
-// Run on page load: enforce login, wire up the landing button, then
-// restore the most recent conversation (if any)
+// ============================================================
+// Initialization
+// ============================================================
 
 async function init() {
-
     await supabaseReady;
-
     accessToken = await requireSession();
-
     if (!accessToken) return;
 
+    setupLandingControls();
+    setupSpeechRecognition();
+    await loadPastSessions();
+}
 
-    // -----------------------------
-    // Start Interview Button
-    // -----------------------------
+function setupLandingControls() {
+    const roleSelect = document.getElementById("roleSelect");
+    const customRoleInput = document.getElementById("customRoleInput");
+    const startBtn = document.getElementById("startBtn");
 
-    document.getElementById("startBtn").addEventListener("click", async () => {
-
-        const roleValue =
-            document.getElementById("roleSelect").value;
-
-        const customRole =
-            document.getElementById("customRoleInput").value.trim();
-
-        selectedRole =
-            roleValue === "Other" && customRole
-                ? customRole
-                : roleValue;
-
-
-        // Create a NEW interview session
-        const res = await fetch("/app/conversations", {
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${accessToken}`
-            },
-
-            body: JSON.stringify({
-                role: selectedRole
-            })
-        });
-
-
-        if (!res.ok) {
-
-            const error = await res.text();
-
-            console.error(
-                "Failed to create conversation:",
-                error
-            );
-
-            return;
+    roleSelect.addEventListener("change", (e) => {
+        if (e.target.value === "Other") {
+            customRoleInput.classList.remove("hidden");
+            customRoleInput.focus();
+        } else {
+            customRoleInput.classList.add("hidden");
         }
-
-
-        const data = await res.json();
-
-
-        // Store NEW conversation ID
-        conversationId = data.conversation_id;
-
-
-        // -----------------------------
-        // Reset interview UI
-        // -----------------------------
-
-        const chatBox =
-            document.getElementById("chatBox");
-
-        chatBox.innerHTML = "";
-
-
-        // Reset question count
-        questionCount = 0;
-
-        document.getElementById("questionNo").innerText =
-            "Question 0 / 11";
-
-        updateProgressBar();
-
-
-        // -----------------------------
-        // Open interview screen
-        // -----------------------------
-
-        document.getElementById("landing").style.display =
-            "none";
-
-        document.getElementById("interview").classList.remove(
-            "hidden"
-        );
-
-
-        // Start timer
-        startTimer();
-
-        // Refresh the sidebar so the new interview shows up immediately
-        await loadConversationList();
-
     });
 
-
-    // -----------------------------
-    // Role selector
-    // -----------------------------
-
-    document.getElementById("roleSelect")
-        .addEventListener("change", (e) => {
-
-            const customInput =
-                document.getElementById("customRoleInput");
-
-            if (e.target.value === "Other") {
-
-                customInput.classList.remove("hidden");
-
-                customInput.focus();
-
-            } else {
-
-                customInput.classList.add("hidden");
-
-            }
-
-        });
-
-
-    toggleCodeEditor(false);
-
-    // -----------------------------
-    // Chat history sidebar
-    // -----------------------------
+    startBtn.addEventListener("click", startAdaptiveInterviewSession);
 
     document.getElementById("newInterviewBtn").addEventListener("click", () => {
         document.getElementById("interview").classList.add("hidden");
         document.getElementById("landing").style.display = "flex";
+        if (timerInterval) clearInterval(timerInterval);
     });
-
-    await loadConversationList();
 }
 
+// ============================================================
+// Resume Upload on Landing Page
+// ============================================================
 
-init();
+async function handleLandingResumeUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-/*
-(async function init() {
+    const statusPill = document.getElementById("resumeStatus");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const skillsContainer = document.getElementById("parsedSkillsPills");
 
-    await supabaseReady;
-    accessToken = await requireSession();
-    if (!accessToken) return; // requireSession already redirected to /login
+    statusPill.innerText = "Parsing...";
+    statusPill.classList.add("loading");
+    fileNameDisplay.innerText = `Uploading ${file.name}...`;
 
-    document.getElementById("startBtn").addEventListener("click", () => {
-        const roleValue = document.getElementById("roleSelect").value;
-        const customRole = document.getElementById("customRoleInput").value.trim();
-        selectedRole = roleValue === "Other" && customRole ? customRole : roleValue;
+    const formData = new FormData();
+    formData.append("file", file);
 
-        
+    try {
+        const res = await fetch("/app/resume/upload", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${accessToken}` },
+            body: formData
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert(`Resume upload failed: ${err.detail || "Error processing file"}`);
+            statusPill.innerText = "Error";
+            return;
+        }
+
+        const data = await res.json();
+        uploadedResumeStructured = data.structured || {};
+        uploadedResumeText = data.raw_text || "";
+
+        statusPill.innerText = "✓ Attached";
+        statusPill.classList.remove("loading");
+        statusPill.classList.add("attached");
+        fileNameDisplay.innerText = `📄 ${file.name} (${uploadedResumeStructured.years_experience || 2}+ yrs exp)`;
+
+        // Render extracted skills pills
+        const skills = uploadedResumeStructured.skills || [];
+        if (skills.length > 0) {
+            skillsContainer.innerHTML = skills.slice(0, 8).map(s => `<span class="skill-pill">${escapeHtml(s)}</span>`).join("");
+            skillsContainer.classList.remove("hidden");
+        }
+    } catch (e) {
+        console.error("Resume upload exception:", e);
+        statusPill.innerText = "Failed";
+    }
+}
+
+// ============================================================
+// Start Adaptive Interview
+// ============================================================
+
+async function startAdaptiveInterviewSession() {
+    const roleVal = document.getElementById("roleSelect").value;
+    const customVal = document.getElementById("customRoleInput").value.trim();
+    selectedRole = (roleVal === "Other" && customVal) ? customVal : roleVal;
+
+    const durationVal = parseInt(document.getElementById("durationSelect").value, 10) || 30;
+    const typeVal = document.getElementById("typeSelect").value;
+    const jdText = document.getElementById("jdInput").value.trim();
+
+    targetDuration = durationVal;
+    document.getElementById("headerRole").innerText = selectedRole;
+
+    // Show initial loading state on start button
+    const startBtn = document.getElementById("startBtn");
+    startBtn.disabled = true;
+    startBtn.innerHTML = `<span>Synthesizing Interview Plan...</span>`;
+
+    try {
+        // 1. Create Interview Plan
+        const createRes = await fetch("/api/interview/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                role: selectedRole,
+                job_description: jdText,
+                resume_text: uploadedResumeText,
+                resume_structured: uploadedResumeStructured,
+                duration_minutes: durationVal,
+                interview_type: typeVal
+            })
+        });
+
+        if (!createRes.ok) {
+            throw new Error(await createRes.text());
+        }
+
+        const createData = await createRes.json();
+        interviewId = createData.interview_id;
+        totalQuestions = createData.total_questions || 8;
+
+        // 2. Start Interview & Fetch Question 1
+        const startRes = await fetch(`/api/interview/${interviewId}/start`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${accessToken}` }
+        });
+
+        if (!startRes.ok) {
+            throw new Error(await startRes.text());
+        }
+
+        const startData = await startRes.json();
+
+        // 3. Switch Screen
         document.getElementById("landing").style.display = "none";
         document.getElementById("interview").classList.remove("hidden");
-        startTimer();
-        
-    });
+        document.getElementById("chatBox").innerHTML = "";
 
-    document.getElementById("roleSelect").addEventListener("change", (e) => {
-        const customInput = document.getElementById("customRoleInput");
-        if (e.target.value === "Other") {
-            customInput.classList.remove("hidden");
-            customInput.focus();
-        } else {
-            customInput.classList.add("hidden");
-        }
-    });
+        currentQuestionIndex = 1;
+        updateQuestionCounter(1, totalQuestions);
+        updateDifficultyBadge(startData.current_difficulty || 2);
+        updateStageBadge(startData.current_stage || "Technical Fundamentals");
+        document.getElementById("currentFocusSkill").innerText = startData.question.skill || "Fundamentals";
 
-    toggleCodeEditor(false);
+        startTimer(durationVal * 60);
 
-    /*old code for viewing history of interviews
-    
-    const res = await fetch("/app/conversations", {
-        headers: { "Authorization": `Bearer ${accessToken}` }
-    });
-    const data = await res.json();
+        // Append initial Question 1
+        appendBotQuestion(startData.question);
 
-    if (data.conversations && data.conversations.length > 0) {
-        conversationId = data.conversations[0].id;
-        await loadHistory(conversationId);
-    }
-
-    
-
-    
-    // Create a NEW interview session
-    const res = await fetch("/app/conversations", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-            role: selectedRole
-        })
-    });
-
-    const data = await res.json();
-
-    // Store the NEW conversation ID
-    conversationId = data.conversation_id;
-
-    // Clear previous chat from UI
-    const chatBox = document.getElementById("chatBox");
-    chatBox.innerHTML = "";
-
-    // Reset interview state
-    questionCount = 0;
-
-    document.getElementById("questionNo").innerText =
-        "Question 0 / 11";
-
-    // Show interview screen
-    
-    document.getElementById("landing").style.display = "none";
-    document.getElementById("interview").classList.remove("hidden");
-
-    startTimer();
-
-    
-
-})();
-
-*/
-
-function startTimer() {
-    if (timerInterval) clearInterval(timerInterval);
-    let seconds = 0;
-    document.getElementById("timer").innerText = "00:00";
-    timerInterval = setInterval(() => {
-        seconds++;
-        const min = Math.floor(seconds / 60);
-        const sec = seconds % 60;
-        document.getElementById("timer").innerText =
-            `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-    }, 1000);
-}
-
-// ---------- Chat history sidebar ----------
-
-async function loadConversationList() {
-    const listEl = document.getElementById("conversationList");
-    if (!listEl) return;
-
-    const res = await fetch("/app/conversations", {
-        headers: { "Authorization": `Bearer ${accessToken}` }
-    });
-    if (!res.ok) return;
-
-    const data = await res.json();
-    const conversations = data.conversations || [];
-
-    if (conversations.length === 0) {
-        listEl.innerHTML = `<p class="sidebar-empty">No interviews yet</p>`;
-        return;
-    }
-
-    listEl.innerHTML = conversations.map(c => {
-        const label = c.target_role || c.title || "Interview";
-        const date = c.created_at
-            ? new Date(c.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })
-            : "";
-        const activeClass = c.id === conversationId ? "active" : "";
-        return `
-        <div class="conversation-item ${activeClass}" data-id="${c.id}" data-role="${label}">
-            <div class="conversation-item-title">${label}</div>
-            <div class="conversation-item-date">${date}</div>
-        </div>`;
-    }).join("");
-
-    listEl.querySelectorAll(".conversation-item").forEach(item => {
-        item.addEventListener("click", () => {
-            resumeConversation(item.dataset.id, item.dataset.role);
-        });
-    });
-}
-
-async function resumeConversation(id, role) {
-    conversationId = id;
-    selectedRole = role;
-    questionCount = 0;
-
-    const chatBox = document.getElementById("chatBox");
-    chatBox.innerHTML = "";
-
-    document.getElementById("landing").style.display = "none";
-    document.getElementById("interview").classList.remove("hidden");
-
-    await loadHistory(id);
-    startTimer();
-
-    document.querySelectorAll(".conversation-item").forEach(item => {
-        item.classList.toggle("active", item.dataset.id === id);
-    });
-}
-
-async function loadHistory(id) {
-    const res = await fetch(`/app/history/${id}`, {
-        headers: { "Authorization": `Bearer ${accessToken}` }
-    });
-    const data = await res.json();
-
-    const chatBox = document.getElementById("chatBox");
-    // Keep the initial greeting, append real history after it
-    data.messages.forEach(m => {
-        appendMessage(m.role, m.content);
-        if (m.role === "user") {
-            questionCount = Math.min(questionCount + 1, 11);
-        }
-    });
-    document.getElementById("questionNo").innerText = `Question ${questionCount} / 11`;
-    updateProgressBar();
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function appendMessage(role, text) {
-    const chatBox = document.getElementById("chatBox");
-
-    if (role !== "user") {
-        const parsed = parseBotMessage(text);
-
-        if (parsed.difficulty && parsed.difficulty !== "final") {
-            updateDifficultyBadge(parsed.difficulty);
-        }
-
-        const avatar = parsed.speaker === "Ricky" ? "👔" : "🧑‍💻";
-        const name = parsed.speaker || "Interviewer";
-
-        chatBox.innerHTML += `
-        <div class="message bot" data-speaker="${name}">
-            <div class="avatar">${avatar}</div>
-            <div class="bubble">
-                <div class="speaker-name">${name}</div>
-                ${formatMessageText(parsed.message)}
+        // Reset Decision Drawer
+        document.getElementById("decisionLogList").innerHTML = `
+            <div class="decision-entry initial">
+                <div class="decision-step-badge">🚀 Interview Initialized</div>
+                <p><strong>Role:</strong> ${escapeHtml(selectedRole)}</p>
+                <p><strong>Initial Focus:</strong> ${escapeHtml(startData.question.skill)}</p>
+                <p><strong>Baseline Difficulty:</strong> Level ${startData.current_difficulty}/5</p>
             </div>
-        </div>
         `;
 
-        if (parsed.scorecard) {
-            renderScorecard(parsed.scorecard);
-        }
+        await loadPastSessions();
+    } catch (err) {
+        console.error("Error starting adaptive interview:", err);
+        alert(`Failed to start interview: ${err.message}`);
+    } finally {
+        startBtn.disabled = false;
+        startBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg><span>Begin Adaptive Interview</span>`;
+    }
+}
 
-        speakText(parsed.message, parsed.speaker);
+// ============================================================
+// Submit Candidate Answer
+// ============================================================
 
-        toggleCodeEditor(parsed.codeRequired === true);
-        return;
+async function sendPrompt() {
+    const promptEl = document.getElementById("prompt");
+    const codeEl = document.getElementById("codeInput");
+    const answerText = promptEl.value.trim();
+    const codeText = isCodeEditorOpen ? codeEl.value.trim() : null;
+
+    if (!answerText && !codeText) return;
+
+    // Stop microphone if currently recording
+    if (isRecordingVoice) {
+        toggleMicRecording();
     }
 
-    // A user "message" containing a fenced code block gets rendered as code
-    const codeBlockMatch = text.match(/```[\w]*\n?([\s\S]*?)```/);
-    const bubbleContent = codeBlockMatch
-        ? `<pre class="code-bubble"><code>${escapeHtml(codeBlockMatch[1].trim())}</code></pre>`
-        : formatMessageText(text);
+    // Append Candidate message to UI
+    let fullUserDisplay = answerText;
+    if (codeText) {
+        const lang = document.getElementById("codeLanguage").value || "python";
+        fullUserDisplay += (fullUserDisplay ? "\n\n" : "") + `\`\`\`${lang}\n${codeText}\n\`\`\``;
+    }
+    appendUserMessage(fullUserDisplay);
+
+    promptEl.value = "";
+    if (codeEl) codeEl.value = "";
+    if (isCodeEditorOpen) toggleCodeEditorMode(false);
+
+    // Show dynamic multi-step loading status
+    showEvalLoading(true);
+
+    try {
+        const res = await fetch(`/api/interview/${interviewId}/answer`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({
+                answer: answerText || "Provided code solution",
+                code: codeText
+            })
+        });
+
+        if (res.status === 401) {
+            window.location.href = "/";
+            return;
+        }
+
+        if (!res.ok) {
+            throw new Error(await res.text());
+        }
+
+        const data = await res.json();
+        showEvalLoading(false);
+
+        // Record entry in Decision Log Drawer
+        appendDecisionLogEntry(data);
+
+        // Update Skill Scores & Difficulty
+        if (data.current_difficulty) {
+            updateDifficultyBadge(data.current_difficulty);
+        }
+        if (data.current_stage) {
+            updateStageBadge(data.current_stage);
+        }
+
+        // Check if interview completed
+        if (data.is_completed) {
+            currentQuestionIndex = totalQuestions;
+            updateQuestionCounter(totalQuestions, totalQuestions);
+            updateProgressBar(100);
+
+            appendBotMessage({
+                speaker: "Alex",
+                message: "Excellent job completing the interview! I've synthesized your evaluation, diagnosed your skill breakdown, and generated your personalized preparation roadmap.",
+                why_this_question: "Interview Completed"
+            });
+
+            if (data.report) {
+                renderFinalReport(data.report);
+            }
+            return;
+        }
+
+        // Advance to Next Question
+        currentQuestionIndex = (data.questions_asked || currentQuestionIndex) + 1;
+        updateQuestionCounter(currentQuestionIndex, totalQuestions);
+        updateProgressBar((currentQuestionIndex / totalQuestions) * 100);
+
+        if (data.next_question) {
+            document.getElementById("currentFocusSkill").innerText = data.next_question.skill || "Technical Depth";
+            appendBotQuestion(data.next_question);
+        }
+
+    } catch (err) {
+        showEvalLoading(false);
+        console.error("Failed to process answer:", err);
+        alert(`Error processing response: ${err.message}`);
+    }
+}
+
+// ============================================================
+// Message Rendering & Audio
+// ============================================================
+
+function appendUserMessage(text) {
+    const chatBox = document.getElementById("chatBox");
+    const codeMatch = text.match(/```(\w+)?\n([\s\S]*?)```/);
+    let bubbleContent = "";
+
+    if (codeMatch) {
+        const textBefore = text.slice(0, codeMatch.index).trim();
+        const code = codeMatch[2];
+        const textAfter = text.slice(codeMatch.index + codeMatch[0].length).trim();
+        
+        if (textBefore) bubbleContent += `<p>${formatMessageText(textBefore)}</p>`;
+        bubbleContent += `<pre class="code-bubble"><code>${escapeHtml(code)}</code></pre>`;
+        if (textAfter) bubbleContent += `<p>${formatMessageText(textAfter)}</p>`;
+    } else {
+        bubbleContent = formatMessageText(text);
+    }
 
     chatBox.innerHTML += `
     <div class="message user">
-        <div class="avatar">😊</div>
+        <div class="avatar">👤</div>
         <div class="bubble">${bubbleContent}</div>
     </div>
     `;
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function escapeHtml(str) {
-    return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+function appendBotQuestion(qItem) {
+    const speaker = qItem.speaker || "Alex";
+    const avatar = speaker === "Ricky" ? "👔" : "🧑‍💻";
+    const whyText = qItem.why_this_question || "";
+
+    const whyBadgeHtml = whyText ? `
+        <div class="why-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="bulb-icon"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/></svg>
+            <span><strong>Why this question?</strong> ${escapeHtml(whyText)}</span>
+        </div>
+    ` : "";
+
+    const categoryTag = `<span class="q-meta-tag category">${escapeHtml(qItem.category || "Technical")}</span>`;
+    const skillTag = `<span class="q-meta-tag skill">${escapeHtml(qItem.skill || "")}</span>`;
+
+    const chatBox = document.getElementById("chatBox");
+    chatBox.innerHTML += `
+    <div class="message bot" data-speaker="${speaker}">
+        <div class="avatar">${avatar}</div>
+        <div class="bubble">
+            <div class="bubble-header">
+                <span class="speaker-name">${speaker} (AI Interviewer)</span>
+                <div class="q-meta-row">${categoryTag} ${skillTag}</div>
+            </div>
+            <div class="question-text">${formatMessageText(qItem.question)}</div>
+            ${whyBadgeHtml}
+        </div>
+    </div>
+    `;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (qItem.requires_code) {
+        toggleCodeEditorMode(true);
+    }
+
+    speakText(qItem.question, speaker);
 }
 
-// Splits a raw bot reply into: speaker, difficulty, visible message text,
-// and (on the final message) the structured scorecard JSON.
-function parseBotMessage(raw) {
-    let text = raw;
-    let speaker = null;
-    let difficulty = null;
-    let scorecard = null;
-
-    const metaMatch = text.match(/^\[SPEAKER:(Alex|Ricky)\]\[DIFFICULTY:(rising|steady|easing|final)\](?:\[CODE:(true|false)\])?\s*/);
-    let codeRequired = false;
-    if (metaMatch) {
-        speaker = metaMatch[1];
-        difficulty = metaMatch[2];
-        codeRequired = metaMatch[3] === "true";
-        text = text.slice(metaMatch[0].length).trim();
-    }
-
-    const jsonMatch = text.match(/```json\s*([\s\S]*?)```/);
-    if (jsonMatch) {
-        try {
-            scorecard = JSON.parse(jsonMatch[1]);
-        } catch (e) {
-            scorecard = null; // model produced malformed JSON — fail gracefully, just skip the visual
-        }
-        text = text.slice(0, jsonMatch.index).trim();
-    }
-
-    return { speaker, difficulty, message: text, scorecard, codeRequired };
+function appendBotMessage(data) {
+    const chatBox = document.getElementById("chatBox");
+    const avatar = data.speaker === "Ricky" ? "👔" : "🧑‍💻";
+    chatBox.innerHTML += `
+    <div class="message bot">
+        <div class="avatar">${avatar}</div>
+        <div class="bubble">
+            <div class="speaker-name">${data.speaker || "AI Interviewer"}</div>
+            <div>${formatMessageText(data.message)}</div>
+        </div>
+    </div>
+    `;
+    chatBox.scrollTop = chatBox.scrollHeight;
+    speakText(data.message, data.speaker);
 }
 
 function formatMessageText(text) {
-    // Basic newline -> <br> so paragraph breaks show up in the bubble
-    return text.replace(/\n/g, "<br>");
+    return escapeHtml(text).replace(/\n/g, "<br>");
 }
 
-function updateDifficultyBadge(difficulty) {
-    const badge = document.getElementById("difficultyBadge");
-    if (!badge) return;
-    const labels = {
-        rising: "🔺 Difficulty: Rising",
-        steady: "➖ Difficulty: Steady",
-        easing: "🔻 Difficulty: Easing",
+function escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+// ============================================================
+// Speech-to-Text (Microphone) using Web Speech API
+// ============================================================
+
+function setupSpeechRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) {
+        const micBtn = document.getElementById("micBtn");
+        if (micBtn) {
+            micBtn.title = "Speech recognition not supported in this browser";
+            micBtn.style.opacity = "0.6";
+        }
+        return;
+    }
+
+    speechRecognizer = new SpeechRec();
+    speechRecognizer.continuous = true;
+    speechRecognizer.interimResults = true;
+    speechRecognizer.lang = "en-US";
+
+    speechRecognizer.onresult = (event) => {
+        let finalTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript + " ";
+            }
+        }
+        if (finalTranscript) {
+            const promptEl = document.getElementById("prompt");
+            promptEl.value += (promptEl.value ? " " : "") + finalTranscript.trim();
+        }
     };
-    badge.innerText = labels[difficulty] || "Difficulty: Steady";
+
+    speechRecognizer.onerror = (event) => {
+        console.warn("Speech recognition error:", event.error);
+        if (isRecordingVoice) toggleMicRecording();
+    };
 }
 
-// ---------- Voice output (mutable — off by default) ----------
+function toggleMicRecording() {
+    if (!speechRecognizer) {
+        alert("Speech recognition is supported in Google Chrome, Edge, and modern browsers.");
+        return;
+    }
+
+    const micBtn = document.getElementById("micBtn");
+    const label = document.getElementById("micBtnLabel");
+
+    if (!isRecordingVoice) {
+        try {
+            speechRecognizer.start();
+            isRecordingVoice = true;
+            micBtn.classList.add("recording");
+            label.innerText = "🔴 Listening... (Click to stop)";
+        } catch (e) {
+            console.error("Failed to start speech recognition:", e);
+        }
+    } else {
+        speechRecognizer.stop();
+        isRecordingVoice = false;
+        micBtn.classList.remove("recording");
+        label.innerText = "🎤 Start Voice Answer";
+    }
+}
+
+// ============================================================
+// Voice Text-to-Speech (Interviewer Voice)
+// ============================================================
 
 function toggleVoiceOutput() {
     voiceOutputEnabled = !voiceOutputEnabled;
     const btn = document.getElementById("voiceToggleBtn");
-    if (btn) btn.innerText = voiceOutputEnabled ? "🔊 Voice" : "🔇 Voice";
+    btn.innerText = voiceOutputEnabled ? "🔊 Voice: ON" : "🔇 Voice";
     if (!voiceOutputEnabled && window.speechSynthesis) {
         window.speechSynthesis.cancel();
     }
@@ -441,172 +478,310 @@ function toggleVoiceOutput() {
 
 function speakText(text, speaker) {
     if (!voiceOutputEnabled || !window.speechSynthesis) return;
-    if (!text || !text.trim()) return;
+    window.speechSynthesis.cancel();
 
-    window.speechSynthesis.cancel(); // don't stack overlapping utterances
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    // Distinct pitch/rate per persona so Alex and Ricky sound different,
-    // without depending on browser-specific voice lists being available.
+    // Clean markdown and quotes
+    const clean = text.replace(/```[\s\S]*?```/g, " code sample omitted ").replace(/[#*`]/g, "");
+    const utterance = new SpeechSynthesisUtterance(clean);
+    
     if (speaker === "Ricky") {
-        utterance.pitch = 1.3;
-        utterance.rate = 1.02;
+        utterance.pitch = 1.25;
+        utterance.rate = 1.05;
     } else {
-        utterance.pitch = 0.85;
+        utterance.pitch = 0.9;
         utterance.rate = 0.98;
     }
 
     window.speechSynthesis.speak(utterance);
 }
 
-// ---------- Progress bar (mirrors "Question X / 11") ----------
+// ============================================================
+// UI Badges & Dynamic State
+// ============================================================
 
-function updateProgressBar() {
-    const fill = document.getElementById("progressBarFill");
-    if (!fill) return;
-    const pct = Math.min(100, Math.max(0, (questionCount / 11) * 100));
-    fill.style.width = `${pct}%`;
+function updateDifficultyBadge(level) {
+    const badge = document.getElementById("difficultyBadge");
+    if (!badge) return;
+
+    badge.className = `diff-badge diff-${level}`;
+    const levelMap = {
+        1: "🟢 Level 1: Beginner",
+        2: "🔵 Level 2: Easy",
+        3: "🟡 Level 3: Intermediate",
+        4: "🟠 Level 4: Advanced",
+        5: "🔴 Level 5: Expert"
+    };
+    badge.innerText = levelMap[level] || `Level ${level}`;
 }
 
-function toggleCodeEditor(show) {
-    const panel = document.getElementById("codeEditorPanel");
-    const textInput = document.getElementById("prompt");
-    const sendBtn = document.getElementById("sendTextBtn");
-    if (!panel) return;
+function updateStageBadge(stage) {
+    const el = document.getElementById("stageBadge");
+    if (el) el.innerText = stage;
+}
 
-    if (show) {
+function updateQuestionCounter(current, total) {
+    const el = document.getElementById("questionNo");
+    if (el) el.innerText = `Question ${current} / ${total}`;
+}
+
+function updateProgressBar(pct) {
+    const fill = document.getElementById("progressBarFill");
+    if (fill) fill.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+    const covEl = document.getElementById("coverageSummary");
+    if (covEl) covEl.innerText = `Coverage: ${Math.round(pct)}%`;
+}
+
+function toggleCodeEditorMode(forceState) {
+    isCodeEditorOpen = (forceState !== undefined) ? forceState : !isCodeEditorOpen;
+    const panel = document.getElementById("codeEditorPanel");
+    const label = document.getElementById("codeToggleLabel");
+
+    if (isCodeEditorOpen) {
         panel.classList.remove("hidden");
-        textInput.classList.add("hidden");
-        sendBtn.classList.add("hidden");
+        label.innerText = "✕ Close Code Editor";
+        document.getElementById("codeInput").focus();
     } else {
         panel.classList.add("hidden");
-        textInput.classList.remove("hidden");
-        sendBtn.classList.remove("hidden");
+        label.innerText = "💻 Add Code Solution";
     }
 }
 
-async function submitCode() {
-    const codeInput = document.getElementById("codeInput");
-    const langSelect = document.getElementById("codeLanguage");
-    const code = codeInput.value.trim();
-    if (code === "") return;
+function showEvalLoading(show) {
+    const el = document.getElementById("evalLoadingIndicator");
+    const textEl = document.getElementById("evalLoadingText");
+    if (!el) return;
 
-    const language = langSelect.value;
-    const wrapped = "```" + language + "\n" + code + "\n```";
-
-    await sendPromptText(wrapped);
-    codeInput.value = "";
+    if (show) {
+        el.classList.remove("hidden");
+        const steps = [
+            "Analyzing candidate answer...",
+            "Evaluating technical depth & reasoning...",
+            "Checking missing concepts & difficulty fit...",
+            "Deciding next adaptation action..."
+        ];
+        let stepIdx = 0;
+        textEl.innerText = steps[0];
+        window._evalInterval = setInterval(() => {
+            stepIdx = (stepIdx + 1) % steps.length;
+            textEl.innerText = steps[stepIdx];
+        }, 1200);
+    } else {
+        el.classList.add("hidden");
+        if (window._evalInterval) clearInterval(window._evalInterval);
+    }
 }
 
-function renderScorecard(data) {
-    const chatBox = document.getElementById("chatBox");
-    const scores = data.scorecard || {};
+function startTimer(durationSeconds) {
+    if (timerInterval) clearInterval(timerInterval);
+    let remaining = durationSeconds;
+    const timerEl = document.getElementById("timer");
 
-    const labelMap = {
-        technical_knowledge: "Technical Knowledge",
-        problem_solving: "Problem Solving",
-        core_cs_fundamentals: "Core CS Fundamentals",
-        project_knowledge: "Project Knowledge",
-        communication: "Communication",
-        confidence: "Confidence",
-        leadership: "Leadership",
-        behavioral_skills: "Behavioral Skills",
-    };
+    function renderTime() {
+        const min = Math.floor(remaining / 60);
+        const sec = remaining % 60;
+        timerEl.innerText = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+    }
 
-    const barsHtml = Object.entries(labelMap).map(([key, label]) => {
-        const value = Math.max(0, Math.min(10, Number(scores[key]) || 0));
-        return `
-        <div class="score-row">
-            <span class="score-label">${label}</span>
-            <div class="score-bar"><div class="score-fill" style="width:${value * 10}%"></div></div>
-            <span class="score-value">${value}/10</span>
-        </div>`;
-    }).join("");
+    renderTime();
+    timerInterval = setInterval(() => {
+        if (remaining > 0) {
+            remaining--;
+            renderTime();
+        }
+    }, 1000);
+}
 
-    const listHtml = (title, items) => {
-        if (!items || !items.length) return "";
-        return `<div class="score-list"><h4>${title}</h4><ul>${items.map(i => `<li>${i}</li>`).join("")}</ul></div>`;
-    };
+// ============================================================
+// Developer & Hackathon Judge Decision Log Drawer
+// ============================================================
 
-    const recClass = (data.recommendation || "").toLowerCase().replace(/\s+/g, "-");
+function toggleDecisionDrawer() {
+    const drawer = document.getElementById("decisionLogDrawer");
+    drawer.classList.toggle("hidden");
+}
 
-    chatBox.innerHTML += `
-    <div class="scorecard-card">
-        <h3>📊 Interview Scorecard</h3>
-        ${barsHtml}
-        ${listHtml("Strengths", data.strengths)}
-        ${listHtml("Areas for Improvement", data.areas_for_improvement)}
-        ${listHtml("Recommended Study Topics", data.study_topics)}
-        <div class="recommendation-badge ${recClass}">${data.recommendation || "—"}</div>
+function appendDecisionLogEntry(turnData) {
+    const list = document.getElementById("decisionLogList");
+    const empty = list.querySelector(".drawer-empty");
+    if (empty) empty.remove();
+
+    const ev = turnData.evaluation || {};
+    const action = turnData.action_taken || "SWITCH_SKILL";
+    const reason = turnData.decision_reason || turnData.why_this_question || "";
+
+    const entryHtml = `
+    <div class="decision-entry">
+        <div class="decision-step-badge">Turn ${turnData.questions_asked || "•"} Evaluation</div>
+        <div class="eval-metrics-row">
+            <span class="metric">Tech: <strong>${ev.technical_score || 0}/10</strong></span>
+            <span class="metric">Reasoning: <strong>${ev.reasoning_score || 0}/10</strong></span>
+            <span class="metric">Overall: <strong>${ev.overall_score || 0}/10</strong></span>
+        </div>
+        ${ev.missing_concepts && ev.missing_concepts.length ? `
+            <div class="detected-gap"><strong>Diagnosed Gaps:</strong> ${escapeHtml(ev.missing_concepts.join(", "))}</div>
+        ` : ""}
+        <div class="action-badge-row">
+            <span class="action-tag">${escapeHtml(action)}</span>
+            <span class="diff-tag">Diff Level: ${turnData.current_difficulty || 2}</span>
+        </div>
+        <div class="decision-rationale">${escapeHtml(reason)}</div>
     </div>
     `;
-    chatBox.scrollTop = chatBox.scrollHeight;
+
+    list.insertAdjacentHTML("afterbegin", entryHtml);
 }
 
-async function sendPrompt() {
-    const promptEl = document.getElementById("prompt");
-    const text = promptEl.value.trim();
-    if (text === "") return;
-    promptEl.value = "";
-    await sendPromptText(text);
+// ============================================================
+// Final Comprehensive Report Modal
+// ============================================================
+
+function renderFinalReport(report) {
+    const modal = document.getElementById("reportModal");
+    modal.classList.remove("hidden");
+
+    document.getElementById("reportRoleSubtitle").innerText = `${report.candidate_role} · Assessment & Preparation Roadmap`;
+    document.getElementById("reportOverallScore").innerText = Math.round(report.overall_score);
+
+    const gradeBadge = document.getElementById("reportGradeBadge");
+    gradeBadge.innerText = report.score_grade || "Hire";
+    gradeBadge.className = `grade-badge grade-${(report.score_grade || "hire").toLowerCase().replace(/\s+/g, "-")}`;
+
+    document.getElementById("reportExecutiveSummary").innerText = report.summary || "";
+
+    // Skill Bars Breakdown
+    const skillContainer = document.getElementById("reportSkillBars");
+    skillContainer.innerHTML = Object.entries(report.skill_breakdown || {}).map(([skill, score]) => {
+        const val = Math.min(100, Math.max(0, Math.round(score)));
+        return `
+        <div class="skill-bar-row">
+            <span class="skill-label">${escapeHtml(skill)}</span>
+            <div class="skill-bar-track">
+                <div class="skill-bar-fill" style="width: ${val}%;"></div>
+            </div>
+            <span class="skill-val">${val}%</span>
+        </div>
+        `;
+    }).join("");
+
+    // Strengths & Weaknesses
+    const strengthsList = document.getElementById("reportStrengthsList");
+    strengthsList.innerHTML = (report.strengths || []).map(s => `<li>${escapeHtml(s)}</li>`).join("") || "<li>Demonstrated foundational problem solving</li>";
+
+    const weaknessesList = document.getElementById("reportWeaknessesList");
+    weaknessesList.innerHTML = (report.weaknesses || []).map(w => `<li>${escapeHtml(w)}</li>`).join("") || "<li>Continue expanding edge-case coverage</li>";
+
+    // Evidence Cards
+    const evidenceContainer = document.getElementById("reportEvidenceContainer");
+    evidenceContainer.innerHTML = (report.evidence || []).map(ev => `
+        <div class="evidence-card ${ev.severity ? ev.severity.toLowerCase() : 'moderate'}">
+            <div class="evidence-header">
+                <strong>Turn ${ev.turn_number}: ${escapeHtml(ev.skill_or_concept)}</strong>
+                <span class="evidence-severity">${escapeHtml(ev.severity || "Moderate")}</span>
+            </div>
+            <div class="evidence-q"><em>"${escapeHtml(ev.question_asked)}"</em></div>
+            <div class="evidence-quote"><strong>Candidate:</strong> "${escapeHtml(ev.candidate_answer_excerpt)}"</div>
+            <div class="evidence-diag"><strong>Diagnosis:</strong> ${escapeHtml(ev.weakness_summary)}</div>
+        </div>
+    `).join("") || "<p>No critical conceptual gaps diagnosed.</p>";
+
+    // 7 / 14 / 30 Day Plan
+    const plan = report.preparation_plan || {};
+    document.getElementById("plan7List").innerHTML = (plan.day_7_focus || []).map(p => `<li>${escapeHtml(p)}</li>`).join("");
+    document.getElementById("plan14List").innerHTML = (plan.day_14_focus || []).map(p => `<li>${escapeHtml(p)}</li>`).join("");
+    document.getElementById("plan30List").innerHTML = (plan.day_30_focus || []).map(p => `<li>${escapeHtml(p)}</li>`).join("");
 }
 
-// Shared by both the plain-text send button and the code editor's submit button.
-async function sendPromptText(text) {
-    const chatBox = document.getElementById("chatBox");
+function closeReportModal() {
+    document.getElementById("reportModal").classList.add("hidden");
+}
 
-    appendMessage("user", text);
-    chatBox.scrollTop = chatBox.scrollHeight;
+// ============================================================
+// Session History Sidebar
+// ============================================================
 
-    const res = await fetch("/app/generate", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${accessToken}`
-        },
-        body: JSON.stringify({
-            prompt: text,
-            conversation_id: conversationId,
-            target_role: selectedRole
-        })
-    });
+async function loadPastSessions() {
+    const listEl = document.getElementById("conversationList");
+    if (!listEl) return;
 
-    if (res.status === 401) {
-        window.location.href = "/";
-        return;
+    try {
+        const res = await fetch("/app/conversations", {
+            headers: { "Authorization": `Bearer ${accessToken}` }
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const convs = data.conversations || [];
+
+        if (convs.length === 0) {
+            listEl.innerHTML = `<p class="sidebar-empty">No past sessions yet</p>`;
+            return;
+        }
+
+        listEl.innerHTML = convs.map(c => `
+            <div class="conversation-item ${c.id === interviewId ? 'active' : ''}" data-id="${c.id}">
+                <div class="conversation-item-title">${escapeHtml(c.target_role || c.title || "Interview")}</div>
+                <div class="conversation-item-date">${c.created_at ? new Date(c.created_at).toLocaleDateString() : ""}</div>
+            </div>
+        `).join("");
+
+        listEl.querySelectorAll(".conversation-item").forEach(item => {
+            item.addEventListener("click", () => resumePastSession(item.dataset.id));
+        });
+    } catch (e) {
+        console.error("Error loading past sessions:", e);
     }
+}
 
+async function resumePastSession(id) {
+    try {
+        interviewId = id;
+        const res = await fetch(`/api/interview/${id}/resume`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${accessToken}` }
+        });
+
+        if (!res.ok) {
+            // Fallback to history
+            await loadLegacyHistory(id);
+            return;
+        }
+
+        const data = await res.json();
+        selectedRole = data.role || "Software Engineer";
+        document.getElementById("headerRole").innerText = selectedRole;
+
+        document.getElementById("landing").style.display = "none";
+        document.getElementById("interview").classList.remove("hidden");
+        document.getElementById("chatBox").innerHTML = "";
+
+        updateDifficultyBadge(data.current_difficulty || 2);
+        updateStageBadge(data.current_stage || "Technical Fundamentals");
+        updateQuestionCounter(data.questions_asked || 1, totalQuestions);
+
+        await loadLegacyHistory(id);
+        startTimer(30 * 60);
+    } catch (e) {
+        console.error("Failed to resume session:", e);
+    }
+}
+
+async function loadLegacyHistory(id) {
+    const res = await fetch(`/app/history/${id}`, {
+        headers: { "Authorization": `Bearer ${accessToken}` }
+    });
     const data = await res.json();
-    conversationId = data.conversation_id;
+    const chatBox = document.getElementById("chatBox");
+    chatBox.innerHTML = "";
 
-    appendMessage("bot", data.response);
-    chatBox.scrollTop = chatBox.scrollHeight;
-
-    questionCount = Math.min(questionCount + 1, 11);
-    document.getElementById("questionNo").innerText = `Question ${questionCount} / 11`;
-    updateProgressBar();
-}
-
-async function uploadResume() {
-    const input = document.getElementById("resumeInput");
-    const file = input.files[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/app/resume/upload", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${accessToken}` },
-        body: formData
+    (data.messages || []).forEach(m => {
+        if (m.role === "user") {
+            appendUserMessage(m.content);
+        } else {
+            // Parse speaker and question text
+            const text = m.content.replace(/^\[SPEAKER:[^\]]+\]\[DIFFICULTY:[^\]]+\](?:\[CODE:[^\]]+\])?\s*/, "");
+            appendBotMessage({ speaker: "Alex", message: text });
+        }
     });
-
-    if (!res.ok) {
-        const err = await res.json();
-        alert(`Resume upload failed: ${err.detail || "unknown error"}`);
-        return;
-    }
-
-    appendMessage("bot", "📄 Got your resume — I'll tailor questions to your background.");
-    document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
 }
+
+init();
