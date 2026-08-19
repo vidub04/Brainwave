@@ -230,6 +230,24 @@ async function testHistory() {
 
     }
 }
+
+//testing current state
+async function testCurrentState() {
+
+    const res = await fetch(
+        `/app/test-state/${conversationId}`,
+        {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        }
+    );
+
+    const data = await res.json();
+
+    console.log("CURRENT STATE:", data);
+}
 /*
 (async function init() {
 

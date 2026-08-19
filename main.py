@@ -93,7 +93,21 @@ async def test_history(
     return result
 
 
+from agents.current_state import get_current_state
 
+
+@app.get("/app/test-state/{conversation_id}")
+async def test_state(
+    conversation_id: str,
+    user=Depends(get_current_user)
+):
+    result = get_current_state(
+        conversation_id,
+        user.id,
+        supabase
+    )
+
+    return result
 
 # ---------- Chat ----------
 
