@@ -9,10 +9,55 @@
 </head>
 <body>
 
+
 <!-- Landing Page -->
 <section id="landing" class="landing">
     <div class="hero">
-</div>
+        <div class="hero-badge">✨ AI-Powered Mock Interviews</div>
+
+        <div class="logo-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                <rect x="9" y="9" width="6" height="6"/>
+                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+            </svg>
+        </div>
+
+        <h1>RoleReady</h1>
+        <p>Practice realistic AI-powered mock interviews with technical and HR interviewers.</p>
+
+        <div class="hero-action-card">
+            <div class="role-select-wrapper">
+                <label for="roleSelect">What role are you interviewing for?</label>
+                <div class="select-container">
+                    <select id="roleSelect">
+                        <option value="Software Engineer">Software Engineer</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="Full Stack Developer">Full Stack Developer</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Data Analyst">Data Analyst</option>
+                        <option value="Product Manager">Product Manager</option>
+                        <option value="DevOps Engineer">DevOps Engineer</option>
+                        <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span class="select-arrow">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                </div>
+                <input id="customRoleInput" type="text" placeholder="Type the role..." class="hidden">
+            </div>
+
+            <button id="startBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Begin Interview</span>
+            </button>
+        </div>
+
+        <div class="hero-footer-links">
+            <a href="/dashboard">📊 View My Progress</a>
+        </div>
     </div>
 </section>
 
