@@ -1,10 +1,12 @@
 ##stable version implementation
 
 from fastapi import FastAPI, Request, Depends, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from fastapi import Header, HTTPException
 from google import genai
 from google.genai import types
 from google.genai.errors import ServerError, ClientError
@@ -13,10 +15,22 @@ import os
 
 load_dotenv()  # load .env BEFORE importing auth, since auth.py reads env vars at import time
 
+##testing agentic section
+
+
 from auth import get_current_user, supabase
+from agents.resume_info import get_resume_details
 from resume import extract_raw_text, structure_resume
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8000"],  # not "*" if using credentials
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],   # <-- must include Authorization, or list it explicitly
+)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -52,6 +66,21 @@ async def get_config():
         "supabase_url": os.getenv("SUPABASE_URL"),
         "supabase_anon_key": os.getenv("SUPABASE_ANON_KEY")
     }
+
+#TESTING AGENTIC
+@app.get("/app/get-resume-info")
+async def test_resume(
+    user=Depends(get_current_user)
+):
+    result = get_resume_details(
+        user.id,
+        supabase
+    )
+
+    return result
+
+
+
 
 
 # ---------- Chat ----------

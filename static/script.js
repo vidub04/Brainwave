@@ -15,6 +15,10 @@ async function init() {
     accessToken = await requireSession();
 
     if (!accessToken) return;
+    console.log("accessToken:", accessToken);
+
+
+
 
 
     // -----------------------------
@@ -151,6 +155,57 @@ async function init() {
 
 
 init();
+
+async function testResume() {
+    try {
+        // Make sure Supabase is initialized
+        await supabaseReady;
+
+        // Get the current logged-in session
+        const { data, error } = await supabaseClient.auth.getSession();
+
+        if (error) {
+            console.error("Session error:", error);
+            return;
+        }
+
+        // Get access token
+        const token = data.session?.access_token;
+
+        if (!token) {
+            console.error("User is not logged in");
+            return;
+        }
+
+        // Call FastAPI
+        const res = await fetch("/app/get-resume-info", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+
+        // Convert response to JSON
+        const result = await res.json();
+
+        console.log("Resume response:", result);
+
+        if (!res.ok) {
+            console.error("Resume request failed:", result);
+            return;
+        }
+
+        // Resume data
+        if (result.found) {
+            console.log("Candidate resume:", result.resume);
+        } else {
+            console.log("No resume found");
+        }
+
+    } catch (error) {
+        console.error("Error fetching resume:", error);
+    }
+}
 
 /*
 (async function init() {
@@ -610,3 +665,4 @@ async function uploadResume() {
     appendMessage("bot", "📄 Got your resume — I'll tailor questions to your background.");
     document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
 }
+
