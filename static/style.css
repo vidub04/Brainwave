@@ -504,9 +504,7 @@ input::placeholder, textarea::placeholder {
     transform: translateY(-1px);
 }
 
-.new-interview-btn:active {
-    transform: translateY(0);
-}
+
 
 .new-interview-btn svg {
     width: 16px;
