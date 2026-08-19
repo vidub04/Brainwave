@@ -2,6 +2,7 @@ import json
 import pdfplumber
 import docx
 from io import BytesIO
+from typing import Dict, Any
 
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
@@ -29,44 +30,56 @@ def extract_raw_text(filename: str, file_bytes: bytes) -> str:
         raise ValueError("Unsupported file type. Please upload a .pdf or .docx resume.")
 
 
-def structure_resume(gemini_client, raw_text: str) -> dict:
+def structure_resume(llm_or_gemini_client, raw_text: str) -> dict:
     """
-    Uses Gemini to turn raw resume text into structured JSON we can
-    feed into interview prompts.
+    Turns raw resume text into structured JSON.
+    Works with both LLMClient and direct google.genai Client.
     """
     prompt = f"""
-    Extract structured information from this resume text.
-    Return ONLY valid JSON, no markdown fences, no extra commentary,
-    matching exactly this shape:
+Extract structured information from this resume text.
+Return ONLY valid JSON matching exactly this shape:
+{{
+  "name": "Candidate Name",
+  "current_role": "Software Engineer",
+  "years_experience": 3,
+  "skills": ["Skill1", "Skill2"],
+  "past_roles": [{{"title": "Role Title", "company": "Company Name", "duration": "2 years"}}],
+  "education": ["Degree details"],
+  "summary": "Brief background summary"
+}}
 
-    {{
-      "name": string,
-      "current_role": string,
-      "years_experience": number,
-      "skills": [string],
-      "past_roles": [{{"title": string, "company": string, "duration": string}}],
-      "education": [string],
-      "summary": string
-    }}
+Resume text:
+\"\"\"{raw_text[:3000]}\"\"\"
+"""
 
-    Resume text:
-    \"\"\"{raw_text}\"\"\"
-    """
+    default_structure = {
+        "name": "Candidate",
+        "current_role": "Engineer",
+        "years_experience": 2,
+        "skills": [],
+        "past_roles": [],
+        "education": [],
+        "summary": raw_text[:300]
+    }
 
-    response = gemini_client.models.generate_content(
-        model="gemini-3.6-flash",
-        contents=prompt,
-    )
+    # If it's our LLMClient
+    if hasattr(llm_or_gemini_client, "generate_json"):
+        return llm_or_gemini_client.generate_json(
+            prompt=prompt,
+            default_data=default_structure
+        )
 
-    cleaned = response.text.strip()
-    if cleaned.startswith("```"):
-        cleaned = cleaned.strip("`")
-        if cleaned.startswith("json"):
-            cleaned = cleaned[4:]
-    cleaned = cleaned.strip()
-
+    # If it's a raw google-genai client
     try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        # fall back gracefully rather than crashing the request
-        return {"summary": raw_text[:1000], "parse_error": True}
+        response = llm_or_gemini_client.models.generate_content(
+            model="gemini-3.5-flash-lite",
+            contents=prompt,
+        )
+        cleaned = response.text.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.strip("`")
+            if cleaned.startswith("json"):
+                cleaned = cleaned[4:]
+        return json.loads(cleaned.strip())
+    except Exception:
+        return default_structure

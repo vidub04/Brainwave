@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoleReady · AI Mock Interview Platform</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>RoleReady · Adaptive AI Interview Engine</title>
+    <link rel="stylesheet" href="/static/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-
-<!-- Landing Page -->
+<!-- Landing / Setup Screen -->
 <section id="landing" class="landing">
     <div class="hero">
-        <div class="hero-badge">✨ AI-Powered Mock Interviews</div>
+        <div class="hero-badge">⚡ Production-Grade Adaptive AI Interview Engine</div>
 
         <div class="logo-circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -23,51 +22,98 @@
             </svg>
         </div>
 
-        <h1>RoleReady</h1>
-        <p>Practice realistic AI-powered mock interviews with technical and HR interviewers.</p>
+        <h1>RoleReady Adaptive Interview Engine</h1>
+        <p>Genuinely reactive mock interviews. Evaluates technical depth, diagnoses missing concepts, dynamically shifts difficulty, and generates evidence-backed reports.</p>
 
         <div class="hero-action-card">
-            <div class="role-select-wrapper">
-                <label for="roleSelect">What role are you interviewing for?</label>
+            <div class="form-group">
+                <label for="roleSelect">Target Role</label>
                 <div class="select-container">
                     <select id="roleSelect">
+                        <option value="Machine Learning Engineer">Machine Learning Engineer</option>
                         <option value="Software Engineer">Software Engineer</option>
-                        <option value="Frontend Developer">Frontend Developer</option>
                         <option value="Backend Developer">Backend Developer</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
                         <option value="Full Stack Developer">Full Stack Developer</option>
                         <option value="Data Scientist">Data Scientist</option>
-                        <option value="Data Analyst">Data Analyst</option>
-                        <option value="Product Manager">Product Manager</option>
-                        <option value="DevOps Engineer">DevOps Engineer</option>
-                        <option value="Machine Learning Engineer">Machine Learning Engineer</option>
-                        <option value="Other">Other</option>
+                        <option value="DevOps & Cloud Engineer">DevOps & Cloud Engineer</option>
+                        <option value="System Design & Distributed Systems">System Design & Distributed Systems</option>
+                        <option value="Other">Other (Custom Role)</option>
                     </select>
                     <span class="select-arrow">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </span>
                 </div>
-                <input id="customRoleInput" type="text" placeholder="Type the role..." class="hidden">
+                <input id="customRoleInput" type="text" placeholder="Specify custom role (e.g. AI Research Scientist)..." class="hidden custom-input">
             </div>
 
-            <button id="startBtn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Begin Interview</span>
+            <div class="form-row-2col">
+                <div class="form-group">
+                    <label for="durationSelect">Interview Duration</label>
+                    <div class="select-container">
+                        <select id="durationSelect">
+                            <option value="15">15 Minutes (Express - 5 Questions)</option>
+                            <option value="30" selected>30 Minutes (Standard - 8 Questions)</option>
+                            <option value="45">45 Minutes (Deep Dive - 11 Questions)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeSelect">Focus Track</label>
+                    <div class="select-container">
+                        <select id="typeSelect">
+                            <option value="Full Technical & System Design">Full Technical & System Design</option>
+                            <option value="Core Fundamentals & Coding">Core Fundamentals & Coding</option>
+                            <option value="System Architecture Deep Dive">System Architecture Deep Dive</option>
+                            <option value="Technical & Behavioral Leadership">Technical & Behavioral Leadership</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="label-with-action">
+                    <label for="resumeUploadInput">Upload Resume (PDF/DOCX)</label>
+                    <span id="resumeStatus" class="status-pill">Optional</span>
+                </div>
+                <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('resumeUploadInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="upload-icon">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <span id="fileNameDisplay">Click or drag & drop candidate resume here</span>
+                    <input type="file" id="resumeUploadInput" accept=".pdf,.docx" style="display:none;" onchange="handleLandingResumeUpload(event)">
+                </div>
+                <div id="parsedSkillsPills" class="skills-pills-row hidden"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="jdInput">Job Description (JD)</label>
+                <textarea id="jdInput" class="jd-textarea" placeholder="Paste target Job Description requirements here to calibrate skills and questions (optional)..."></textarea>
+            </div>
+
+            <button id="startBtn" class="primary-start-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Begin Adaptive Interview</span>
             </button>
         </div>
 
         <div class="hero-footer-links">
-            <a href="/dashboard">📊 View My Progress</a>
+            <a href="/dashboard">📊 View Performance Analytics & Past Scorecards</a>
         </div>
     </div>
 </section>
 
-<!-- Interview Screen (auth-gated, starts hidden) -->
+<!-- Active Interview Screen -->
 <section id="interview" class="hidden interview-layout">
 
+    <!-- Sidebar History -->
     <aside id="historySidebar" class="history-sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="4" y="4" width="16" height="16" rx="2"/>
                     <rect x="9" y="9" width="6" height="6"/>
                     <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
@@ -77,105 +123,222 @@
         </div>
 
         <button id="newInterviewBtn" class="new-interview-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             <span>New Interview</span>
         </button>
 
-        <div class="sidebar-title">Past Interviews</div>
+        <div class="sidebar-title">Past Sessions</div>
         <div id="conversationList" class="conversation-list">
-            <p class="sidebar-empty">No interviews yet</p>
+            <p class="sidebar-empty">No past sessions</p>
         </div>
 
         <div class="sidebar-footer">
             <a href="/app" class="sidebar-footer-link" onclick="window.location.reload(); return false;">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 <span>Home</span>
+            </a>
+            <a href="/dashboard" class="sidebar-footer-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Analytics</span>
             </a>
         </div>
     </aside>
 
+    <!-- Main Interview Area -->
     <div class="interview-main">
-
-        <header>
-            <div class="logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                    <rect x="9" y="9" width="6" height="6"/>
-                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
-                </svg>
-                <span>RoleReady</span>
+        <header class="interview-header">
+            <div class="header-left">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        <rect x="9" y="9" width="6" height="6"/>
+                    </svg>
+                    <span id="headerRole">Software Engineer</span>
+                </div>
+                <span id="stageBadge" class="stage-pill">Technical Fundamentals</span>
             </div>
 
             <div class="stats">
-                <span id="questionNo" class="stat-badge">Question 1 / 11</span>
+                <span id="questionNo" class="stat-badge">Question 1 / 8</span>
                 <span class="stat-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <span id="timer">00:00</span>
                 </span>
-                <span id="difficultyBadge">➖ Difficulty: Steady</span>
-                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" title="Mute/unmute interviewer voice" style="width:auto; padding:6px 12px;">🔇 Voice</button>
-                <label for="resumeInput" class="toolbar-btn" style="cursor:pointer;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    <span>Upload resume</span>
-                </label>
-                <input id="resumeInput" type="file" accept=".pdf,.docx" style="display:none;" onchange="uploadResume()">
-                <button onclick="signOut()" class="toolbar-btn logout-btn" style="width:auto; padding:6px 12px;">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    <span>Log out</span>
+                <span id="difficultyBadge" class="diff-badge diff-2">🔵 Level 2: Easy</span>
+                <button id="decisionLogToggleBtn" onclick="toggleDecisionDrawer()" class="judge-mode-btn" title="Inspect live agent reasoning logs">
+                    🛠️ Judge Decision Log
                 </button>
+                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" class="toolbar-btn" style="width:auto; padding:6px 12px;">🔇 Voice</button>
+                <button onclick="signOut()" class="toolbar-btn logout-btn" style="width:auto; padding:6px 12px;">Log out</button>
             </div>
         </header>
 
+        <!-- Progress Tracker Bar -->
         <div class="progress-bar-track">
             <div id="progressBarFill" class="progress-bar-fill"></div>
         </div>
 
+        <div class="focus-bar">
+            <span>Current Skill Focus: <strong id="currentFocusSkill">Core Fundamentals</strong></span>
+            <span id="coverageSummary">Coverage: 0%</span>
+        </div>
+
+        <!-- Chat Conversation Box -->
         <div class="chat-box" id="chatBox">
-            <div class="message bot">
-                <div class="avatar">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
-                </div>
+            <div class="message bot" data-speaker="Interviewer">
+                <div class="avatar">🧑‍💻</div>
                 <div class="bubble">
-                    <div class="speaker-name">Interviewer</div>
-                    Welcome! I'll be your interviewer today.
-                    <br><br>
-                    Please introduce yourself and tell me the role you're applying for.
+                    <div class="speaker-name">AI Interviewer</div>
+                    Initializing your adaptive interview plan...
                 </div>
             </div>
         </div>
 
-        <div class="input-area">
-            <textarea id="prompt" placeholder="Type your answer... (Press Send when ready)"></textarea>
-            <button id="sendTextBtn" onclick="sendPrompt()">
-                <span>Send</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        <!-- Adaptive Loading Status Indicator -->
+        <div id="evalLoadingIndicator" class="eval-loading hidden">
+            <div class="pulse-spinner"></div>
+            <span id="evalLoadingText">Evaluating technical depth and reasoning...</span>
+        </div>
+
+        <!-- Candidate Input Controls -->
+        <div class="input-controls-bar">
+            <button id="micBtn" class="mic-btn" onclick="toggleMicRecording()" title="Speak answer using microphone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mic-icon">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                </svg>
+                <span id="micBtnLabel">🎤 Start Voice Answer</span>
+            </button>
+
+            <button id="codeToggleBtn" class="toggle-code-btn" onclick="toggleCodeEditorMode()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span id="codeToggleLabel">💻 Add Code Solution</span>
             </button>
         </div>
 
+        <!-- Plain Text Answer Area -->
+        <div class="input-area" id="textInputArea">
+            <textarea id="prompt" placeholder="Type your answer here... Explain your reasoning, tradeoffs, and practical edge cases."></textarea>
+            <button id="sendTextBtn" onclick="sendPrompt()">
+                <span>Submit Answer</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+
+        <!-- Code Editor Panel (Collapsible / Dynamic) -->
         <div id="codeEditorPanel" class="code-editor-panel hidden">
             <div class="code-editor-header">
                 <div class="code-editor-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                    <span>Alex wants a code answer for this one</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <span>Code Editor (Algorithm & Implementation)</span>
                 </div>
                 <select id="codeLanguage">
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>
                     <option value="cpp">C++</option>
-                    <option value="c">C</option>
+                    <option value="sql">SQL</option>
                 </select>
             </div>
-            <textarea id="codeInput" class="code-input" placeholder="// write your solution here..." spellcheck="false"></textarea>
-            <button onclick="submitCode()" class="submit-code-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Submit Code</span>
-            </button>
+            <textarea id="codeInput" class="code-input" placeholder="// Write your implementation, helper functions, and logic here..." spellcheck="false"></textarea>
         </div>
 
     </div>
 
+    <!-- Developer & Judge Live Decision Log Drawer -->
+    <div id="decisionLogDrawer" class="decision-drawer hidden">
+        <div class="drawer-header">
+            <div class="drawer-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span>Agent Decision Trajectory</span>
+            </div>
+            <button onclick="toggleDecisionDrawer()" class="close-drawer-btn">✕</button>
+        </div>
+        <div class="drawer-desc">Real-time reasoning logs from the Evaluation Agent and Adaptive Decision Engine:</div>
+        <div id="decisionLogList" class="decision-log-list">
+            <p class="drawer-empty">Waiting for first turn completion...</p>
+        </div>
+    </div>
+
 </section>
+
+<!-- Comprehensive Final Report Modal -->
+<div id="reportModal" class="modal-backdrop hidden">
+    <div class="report-card-modal">
+        <div class="modal-header">
+            <div>
+                <h2>🎓 Final Adaptive Interview Assessment</h2>
+                <p id="reportRoleSubtitle">Candidate Performance & Technical Readiness Report</p>
+            </div>
+            <button onclick="closeReportModal()" class="close-modal-btn">✕</button>
+        </div>
+
+        <div class="report-body">
+            <!-- Overall Score Hero -->
+            <div class="report-score-hero">
+                <div class="score-dial">
+                    <span id="reportOverallScore" class="score-number">82</span>
+                    <span class="score-max">/ 100</span>
+                </div>
+                <div class="score-info">
+                    <div id="reportGradeBadge" class="grade-badge grade-hire">Hire</div>
+                    <p id="reportExecutiveSummary">Demonstrated solid command of core engineering fundamentals and clear communication under technical evaluation.</p>
+                </div>
+            </div>
+
+            <!-- Skill Mastery Breakdown -->
+            <div class="report-section">
+                <h3>📊 Skill Mastery Graph</h3>
+                <div id="reportSkillBars" class="skill-bars-container"></div>
+            </div>
+
+            <!-- Strengths & Weaknesses -->
+            <div class="report-grid-2col">
+                <div class="report-section">
+                    <h3 class="text-success">✅ Key Strengths</h3>
+                    <ul id="reportStrengthsList" class="report-list strengths-list"></ul>
+                </div>
+                <div class="report-section">
+                    <h3 class="text-danger">⚠️ Diagnosed Growth Areas</h3>
+                    <ul id="reportWeaknessesList" class="report-list weaknesses-list"></ul>
+                </div>
+            </div>
+
+            <!-- Evidence-Backed Weakness Cards -->
+            <div class="report-section">
+                <h3>🔍 Evidence-Backed Assessment</h3>
+                <p class="section-subtext">Exact interview questions and candidate responses that informed the diagnosis:</p>
+                <div id="reportEvidenceContainer" class="evidence-cards-container"></div>
+            </div>
+
+            <!-- Actionable 7 / 14 / 30 Day Prep Roadmap -->
+            <div class="report-section">
+                <h3>🚀 Personalized Preparation Roadmap</h3>
+                <div class="roadmap-grid">
+                    <div class="roadmap-card day-7">
+                        <h4>7-Day Quick Wins</h4>
+                        <ul id="plan7List"></ul>
+                    </div>
+                    <div class="roadmap-card day-14">
+                        <h4>14-Day Applied Depth</h4>
+                        <ul id="plan14List"></ul>
+                    </div>
+                    <div class="roadmap-card day-30">
+                        <h4>30-Day Master Loop</h4>
+                        <ul id="plan30List"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button onclick="window.print()" class="secondary-btn">🖨️ Print / Save PDF</button>
+            <button onclick="window.location.reload()" class="primary-btn">Start New Session</button>
+        </div>
+    </div>
+</div>
 
 <script src="/static/config.js"></script>
 <script src="/static/auth.js"></script>
