@@ -207,6 +207,29 @@ async function testResume() {
     }
 }
 
+//testing history
+
+async function testHistory() {
+
+    try {
+
+        const res = await fetch("/app/test-history", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`
+            }
+        });
+
+        const result = await res.json();
+
+        console.log("Interview history:", result);
+
+    } catch (error) {
+
+        console.error("History error:", error);
+
+    }
+}
 /*
 (async function init() {
 

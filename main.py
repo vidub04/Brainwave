@@ -21,6 +21,7 @@ load_dotenv()  # load .env BEFORE importing auth, since auth.py reads env vars a
 from auth import get_current_user, supabase
 from agents.resume_info import get_resume_details
 from resume import extract_raw_text, structure_resume
+from agents.interview_history import get_interview_history
 
 app = FastAPI()
 
@@ -79,6 +80,17 @@ async def test_resume(
 
     return result
 
+@app.get("/app/test-history")
+async def test_history(
+    user=Depends(get_current_user)
+):
+
+    result = get_interview_history(
+        user.id,
+        supabase
+    )
+
+    return result
 
 
 
