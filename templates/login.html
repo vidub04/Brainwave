@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login · RoleReady</title>
-    <link rel="stylesheet" href="/static/style.css?v=2">
+    <title>Login · RoleReady Adaptive Mock Interviews</title>
+    <link rel="stylesheet" href="/static/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -21,7 +21,7 @@
                 </svg>
                 <span>RoleReady</span>
             </div>
-            <p class="login-subtitle">Sign in or create an account to start mock interviews</p>
+            <p class="login-subtitle">Sign in or create an account to practice adaptive AI mock interviews</p>
         </header>
 
         <div class="login-form">
@@ -31,7 +31,7 @@
                 <input
                     id="email"
                     type="email"
-                    placeholder="you@company.com"
+                    placeholder="candidate@example.com"
                     autocomplete="email"
                     required
                 >
@@ -54,11 +54,19 @@
                 </button>
 
                 <button class="btn-secondary" onclick="signUp()">
-                    Sign Up
+                    Sign Up (Instant Auto-Verify)
                 </button>
             </div>
 
-            <p id="authMsg"></p>
+            <div class="divider-row">
+                <span>OR</span>
+            </div>
+
+            <button class="btn-demo-access" onclick="quickDemoLogin()">
+                ⚡ 1-Click Candidate Demo Access
+            </button>
+
+            <p id="authMsg" style="display:none; font-size: 0.85rem; margin-top: 12px; text-align: center;"></p>
 
         </div>
 
@@ -66,6 +74,15 @@
 
     <script src="/static/config.js"></script>
     <script src="/static/auth.js"></script>
+
+    <script>
+        // Allow pressing Enter key in inputs to log in
+        document.querySelectorAll("#email, #password").forEach(el => {
+            el.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") signIn();
+            });
+        });
+    </script>
 
 </body>
 </html>

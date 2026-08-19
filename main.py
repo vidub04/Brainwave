@@ -62,6 +62,76 @@ async def get_config():
 
 
 # ============================================================
+# Authentication API Endpoints (Auto-confirmed / Rate-limit Proof)
+# ============================================================
+
+class AuthRequest(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/api/auth/signup")
+async def api_auth_signup(data: AuthRequest):
+    """
+    Creates and auto-confirms user via Supabase admin service to bypass SMTP rate limits.
+    """
+    email = data.email.strip().lower()
+    password = data.password.strip()
+
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+
+    if not supabase:
+        raise HTTPException(status_code=500, detail="Authentication service unavailable.")
+
+    try:
+        res = supabase.auth.admin.create_user({
+            "email": email,
+            "password": password,
+            "email_confirm": True
+        })
+        return {
+            "status": "ok",
+            "message": "Account created and verified! Logging you in...",
+            "user_id": res.user.id
+        }
+    except Exception as e:
+        err_msg = str(e)
+        if "already registered" in err_msg.lower() or "unique" in err_msg.lower():
+            return {
+                "status": "exists",
+                "message": "This email is already registered. Logging you in..."
+            }
+        logger.warning(f"Error during admin user creation: {e}")
+        raise HTTPException(status_code=400, detail=err_msg)
+
+
+@app.post("/api/auth/demo-login")
+async def api_auth_demo():
+    """
+    Provides instant 1-click candidate demo credentials for evaluations and hackathon judging.
+    """
+    demo_email = "candidate_demo@roleready.ai"
+    demo_password = "RoleReadyDemo2026!"
+
+    if supabase:
+        try:
+            # Ensure demo user exists
+            supabase.auth.admin.create_user({
+                "email": demo_email,
+                "password": demo_password,
+                "email_confirm": True
+            })
+        except Exception:
+            pass
+
+    return {
+        "email": demo_email,
+        "password": demo_password
+    }
+
+
+# ============================================================
 # Production Adaptive Interview Engine API Endpoints
 # ============================================================
 

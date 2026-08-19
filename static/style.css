@@ -2569,3 +2569,44 @@ body.login-page {
     font-weight: 600;
 }
 
+/* ---------- Login Additions ---------- */
+.divider-row {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 14px 0;
+    color: var(--text-muted);
+    font-size: var(--font-xs);
+}
+
+.divider-row::before, .divider-row::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.divider-row span {
+    padding: 0 10px;
+}
+
+.btn-demo-access {
+    width: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    color: #93c5fd;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-demo-access:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(147, 51, 234, 0.25));
+    border-color: #60a5fa;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+
