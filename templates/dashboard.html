@@ -11,8 +11,21 @@
 
 <section id="dashboard" class="dashboard">
     <header class="dashboard-header">
-        <div class="logo">📊 Your Progress</div>
-        <a href="/app" class="back-link">← Back to Interviews</a>
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span>Performance Analytics</span>
+            </div>
+            <span class="header-subtitle">Track your mock interview metrics and category score progression</span>
+        </div>
+        <a href="/app" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Interviews</span>
+        </a>
     </header>
 
     <div id="dashboardContent" class="dashboard-content">
@@ -23,13 +36,28 @@
         <div id="summaryRow" class="summary-row hidden"></div>
 
         <div id="chartCard" class="chart-card hidden">
-            <h3>Score trend across sessions</h3>
-            <svg id="trendChart" viewBox="0 0 900 320" class="trend-chart"></svg>
+            <div class="card-header">
+                <h3>Score Trend Across Sessions</h3>
+                <span class="card-subtitle">Category rating progression (0 - 10 scale)</span>
+            </div>
+            <div class="chart-wrapper">
+                <svg id="trendChart" viewBox="0 0 900 320" class="trend-chart"></svg>
+            </div>
             <div id="chartLegend" class="chart-legend"></div>
         </div>
 
         <div id="sessionTable" class="session-table hidden">
-            <h3>Past interviews</h3>
+            <div class="table-header-block">
+                <h3>Past Interviews</h3>
+                <span class="card-subtitle">Detailed breakdown and hiring recommendation of completed sessions</span>
+            </div>
+            <div class="session-table-header">
+                <span>Session</span>
+                <span>Role</span>
+                <span>Date</span>
+                <span>Score</span>
+                <span>Recommendation</span>
+            </div>
             <div id="sessionRows"></div>
         </div>
     </div>

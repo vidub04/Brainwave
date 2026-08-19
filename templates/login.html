@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login · RoleReady</title>
-
     <link rel="stylesheet" href="/static/style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -15,33 +13,49 @@
     <div id="login-container">
 
         <header class="login-header">
-            <div class="logo">🤖 RoleReady</div>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                </svg>
+                <span>RoleReady</span>
+            </div>
+            <p class="login-subtitle">Sign in or create an account to start mock interviews</p>
         </header>
 
         <div class="login-form">
 
-            <input
-                id="email"
-                type="email"
-                placeholder="Email"
-            >
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input
+                    id="email"
+                    type="email"
+                    placeholder="you@company.com"
+                    autocomplete="email"
+                    required
+                >
+            </div>
 
-            <input
-                id="password"
-                type="password"
-                placeholder="Password"
-            >
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••••••"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
 
             <div class="login-buttons">
-
-                <button onclick="signIn()">
+                <button class="btn-primary" onclick="signIn()">
                     Log In
                 </button>
 
-                <button onclick="signUp()">
+                <button class="btn-secondary" onclick="signUp()">
                     Sign Up
                 </button>
-
             </div>
 
             <p id="authMsg"></p>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoleReady</title>
+    <title>RoleReady · AI Mock Interview Platform</title>
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -12,31 +12,62 @@
 <!-- Landing Page -->
 <section id="landing" class="landing">
     <div class="hero">
-        <div class="logo-circle">🧠</div>
-        <h1>RoleReady</h1>
-        <p>
-            Practice realistic AI-powered mock interviews with
-            technical and HR interviewers.
-        </p>
-        <br>
-        <div class="role-select-wrapper">
-            <label for="roleSelect">What role are you interviewing for?</label>
-            <select id="roleSelect">
-                <option value="Software Engineer">Software Engineer</option>
-                <option value="Frontend Developer">Frontend Developer</option>
-                <option value="Backend Developer">Backend Developer</option>
-                <option value="Full Stack Developer">Full Stack Developer</option>
-                <option value="Data Scientist">Data Scientist</option>
-                <option value="Data Analyst">Data Analyst</option>
-                <option value="Product Manager">Product Manager</option>
-                <option value="DevOps Engineer">DevOps Engineer</option>
-                <option value="Machine Learning Engineer">Machine Learning Engineer</option>
-                <option value="Other">Other</option>
-            </select>
-            <input id="customRoleInput" type="text" placeholder="Type the role..." class="hidden">
+        <div class="hero-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+            AI Interview Intelligence
         </div>
-        <br><br>
-        <button id="startBtn">🚀 Let's Begin Interview</button>
+        <div class="logo-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                <rect x="9" y="9" width="6" height="6"/>
+                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+            </svg>
+        </div>
+        <h1>Master Your Next Technical & HR Interview</h1>
+        <p>
+            Experience adaptive AI mock interviews with specialized senior engineering and HR hiring personas.
+        </p>
+
+        <div class="hero-action-card">
+            <div class="role-select-wrapper">
+                <label for="roleSelect">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Target Interview Role
+                </label>
+                <div class="select-container">
+                    <select id="roleSelect">
+                        <option value="Software Engineer">Software Engineer</option>
+                        <option value="Frontend Developer">Frontend Developer</option>
+                        <option value="Backend Developer">Backend Developer</option>
+                        <option value="Full Stack Developer">Full Stack Developer</option>
+                        <option value="Data Scientist">Data Scientist</option>
+                        <option value="Data Analyst">Data Analyst</option>
+                        <option value="Product Manager">Product Manager</option>
+                        <option value="DevOps Engineer">DevOps Engineer</option>
+                        <option value="Machine Learning Engineer">Machine Learning Engineer</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <div class="select-arrow">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                </div>
+                <input id="customRoleInput" type="text" placeholder="Type custom role title..." class="hidden">
+            </div>
+
+            <button id="startBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Start Mock Interview</span>
+            </button>
+        </div>
+
+        <div class="hero-footer-links">
+            <span>Powered by Gemini 2.0</span>
+            <span>•</span>
+            <a href="/login" style="display:none">Log in</a>
+            <span>Structured Scorecards</span>
+            <span>•</span>
+            <span>Live Voice Synthesis</span>
+        </div>
     </div>
 </section>
 
@@ -44,26 +75,64 @@
 <section id="interview" class="hidden interview-layout">
 
     <aside id="historySidebar" class="history-sidebar">
-        <button id="newInterviewBtn" class="new-interview-btn">+ New Interview</button>
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                </svg>
+                <span>RoleReady</span>
+            </div>
+        </div>
+
+        <button id="newInterviewBtn" class="new-interview-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New Interview</span>
+        </button>
+
         <div class="sidebar-title">Past Interviews</div>
         <div id="conversationList" class="conversation-list">
             <p class="sidebar-empty">No interviews yet</p>
+        </div>
+
+        <div class="sidebar-footer">
+            <a href="/app" class="sidebar-footer-link" onclick="window.location.reload(); return false;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <span>Home</span>
+            </a>
         </div>
     </aside>
 
     <div class="interview-main">
 
         <header>
-            <div class="logo">🤖 RoleReady</div>
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                </svg>
+                <span>RoleReady</span>
+            </div>
 
             <div class="stats">
-                <span id="questionNo">Question 1 / 11</span>
-                <span>⏱️ <span id="timer">00:00</span></span>
+                <span id="questionNo" class="stat-badge">Question 1 / 11</span>
+                <span class="stat-badge">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span id="timer">00:00</span>
+                </span>
                 <span id="difficultyBadge">➖ Difficulty: Steady</span>
-                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" title="Mute/unmute interviewer voice" style="width:auto; padding:6px 10px;">🔇 Voice</button>
-                <label for="resumeInput" style="cursor:pointer;">📄 Upload resume</label>
+                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" title="Mute/unmute interviewer voice" style="width:auto; padding:6px 12px;">🔇 Voice</button>
+                <label for="resumeInput" class="toolbar-btn" style="cursor:pointer;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span>Upload resume</span>
+                </label>
                 <input id="resumeInput" type="file" accept=".pdf,.docx" style="display:none;" onchange="uploadResume()">
-                <button onclick="signOut()" style="width:auto; padding:6px 10px;">Log out</button>
+                <button onclick="signOut()" class="toolbar-btn logout-btn" style="width:auto; padding:6px 12px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    <span>Log out</span>
+                </button>
             </div>
         </header>
 
@@ -73,8 +142,11 @@
 
         <div class="chat-box" id="chatBox">
             <div class="message bot">
-                <div class="avatar">🤖</div>
+                <div class="avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
+                </div>
                 <div class="bubble">
+                    <div class="speaker-name">Interviewer</div>
                     Welcome! I'll be your interviewer today.
                     <br><br>
                     Please introduce yourself and tell me the role you're applying for.
@@ -83,13 +155,19 @@
         </div>
 
         <div class="input-area">
-            <textarea id="prompt" placeholder="Type your answer..."></textarea>
-            <button id="sendTextBtn" onclick="sendPrompt()">Send →</button>
+            <textarea id="prompt" placeholder="Type your answer... (Press Send when ready)"></textarea>
+            <button id="sendTextBtn" onclick="sendPrompt()">
+                <span>Send</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
         </div>
 
         <div id="codeEditorPanel" class="code-editor-panel hidden">
             <div class="code-editor-header">
-                <span>💻 Alex wants a code answer for this one</span>
+                <div class="code-editor-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <span>Alex wants a code answer for this one</span>
+                </div>
                 <select id="codeLanguage">
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
@@ -98,8 +176,11 @@
                     <option value="c">C</option>
                 </select>
             </div>
-            <textarea id="codeInput" class="code-input" placeholder="// write your solution here" spellcheck="false"></textarea>
-            <button onclick="submitCode()">Submit Code →</button>
+            <textarea id="codeInput" class="code-input" placeholder="// write your solution here..." spellcheck="false"></textarea>
+            <button onclick="submitCode()" class="submit-code-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Submit Code</span>
+            </button>
         </div>
 
     </div>
