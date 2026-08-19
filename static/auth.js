@@ -29,6 +29,12 @@ async function create_client() {
 const supabaseReady=create_client();
 
 async function signUp() {
+
+    if (!supabaseReady) {
+        document.getElementById("authMsg").textContent =
+            "Please wait, authentication is initializing...";
+        return;
+    }
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const { error } = await supabaseClient.auth.signUp({ email, password });
