@@ -59,6 +59,9 @@ Guidelines:
    - 70-84: "Hire"
    - 55-69: "Borderline"
    - < 55: "Needs Work"
+4. If CANDIDATE MEMORY (history from past interviews) is provided, weave a brief growth-over-time note into the
+   summary — e.g. whether recurring weak skills from past sessions improved this time — without inventing details
+   not present in the trajectory or memory provided.
 """
 
 class InterviewReportGenerator:
@@ -97,6 +100,13 @@ class InterviewReportGenerator:
 
         trajectory_text = "\n".join(trajectory_lines)
 
+        memory_block = ""
+        if state.candidate_memory and state.candidate_memory.total_past_interviews > 0:
+            memory_block = f"""
+CANDIDATE MEMORY (from {state.candidate_memory.total_past_interviews} past interview(s) on this platform):
+\"\"\"{state.candidate_memory.summary_text}\"\"\"
+"""
+
         prompt = f"""
 CANDIDATE ROLE: {state.role}
 INTERVIEW DURATION: {state.target_duration_minutes} minutes
@@ -105,7 +115,7 @@ SKILL SCORES (out of 10): {state.skill_scores}
 WEAK SKILLS: {state.weak_skills}
 STRONG SKILLS: {state.strong_skills}
 ALL MISSING CONCEPTS: {state.missing_concepts}
-
+{memory_block}
 COMPLETE INTERVIEW TRAJECTORY:
 {trajectory_text}
 

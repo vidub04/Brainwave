@@ -172,7 +172,8 @@ async def api_create_interview(
             "role": state.role,
             "interview_plan": state.interview_plan,
             "total_questions": state.interview_plan.total_target_questions if state.interview_plan else 8,
-            "target_duration_minutes": state.target_duration_minutes
+            "target_duration_minutes": state.target_duration_minutes,
+            "candidate_memory": state.candidate_memory
         }
     except Exception as e:
         logger.error(f"Error in api_create_interview: {e}")
@@ -481,6 +482,30 @@ async def get_history(conversation_id: str, user=Depends(get_current_user)):
         msgs.append({"role": "bot", "content": f"[SPEAKER:{q.speaker}][DIFFICULTY:steady][CODE:{'true' if q.requires_code else 'false'}] {q.question}"})
         msgs.append({"role": "user", "content": h.candidate_answer})
     return {"messages": msgs}
+
+
+@app.get("/app/progress")
+async def get_progress(user=Depends(get_current_user)):
+    """Returns the candidate's past scorecards (for the dashboard trend chart)
+    plus their long-term candidate memory summary (recurring strengths/weaknesses
+    across sessions)."""
+    scorecards = []
+    if supabase:
+        try:
+            scorecards = supabase.table("scorecards") \
+                .select("*") \
+                .eq("user_id", user.id) \
+                .order("created_at") \
+                .execute().data or []
+        except Exception as e:
+            logger.warning(f"Could not fetch scorecards for progress dashboard: {e}")
+
+    memory = orchestrator.memory_manager.get_candidate_memory(user_id=user.id)
+
+    return {
+        "scorecards": scorecards,
+        "candidate_memory": memory
+    }
 
 
 @app.post("/app/resume/upload")

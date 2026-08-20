@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, Dict, Any
-from .models import InterviewPlan, SkillPriority
+from .models import InterviewPlan, SkillPriority, CandidateMemory
 from .llm_client import get_llm_client, LLMClient
 
 logger = logging.getLogger("adaptive_engine.planner")
@@ -41,6 +41,11 @@ Guidelines:
 2. Calibrate initial_difficulty based on resume experience (1: Intern/New Grad, 2: Junior/Mid, 3: Mid-Senior, 4: Senior/Lead, 5: Staff/Principal). Default to 2 or 3 if unspecified.
 3. Total questions should be proportional to duration (e.g. 20-30 mins = 6-8 questions, 45-60 mins = 9-12 questions).
 4. Stage distribution must sum to approximately 1.0.
+5. If CANDIDATE MEMORY (history from past interviews) is provided: raise the priority of skills listed as
+   "recurring weak areas" so they get retested (do not skip them just because they were weak before), calibrate
+   initial_difficulty a little higher if the candidate's past average score/trend is strong, and mention in
+   strategy_summary how this session builds on what we already know about the candidate. If no candidate memory
+   is provided, treat this as a first-time candidate and plan from the resume/JD alone.
 """
 
 class InterviewPlanner:
@@ -54,9 +59,11 @@ class InterviewPlanner:
         resume_text: Optional[str] = None,
         resume_structured: Optional[Dict[str, Any]] = None,
         duration_minutes: int = 30,
-        interview_type: str = "Standard"
+        interview_type: str = "Standard",
+        candidate_memory: Optional[CandidateMemory] = None
     ) -> InterviewPlan:
-        """Analyzes candidate resume & JD to produce the initial interview plan."""
+        """Analyzes candidate resume & JD, plus any long-term candidate memory
+        from past interviews, to produce the initial interview plan."""
         resume_summary = ""
         if resume_structured:
             skills = ", ".join(resume_structured.get("skills", []))
@@ -68,6 +75,13 @@ class InterviewPlanner:
 
         jd_text = job_description or "Standard expectations for a top-tier tech company role."
 
+        memory_block = ""
+        if candidate_memory and candidate_memory.total_past_interviews > 0:
+            memory_block = f"""
+CANDIDATE MEMORY (from {candidate_memory.total_past_interviews} past interview(s) on this platform):
+\"\"\"{candidate_memory.summary_text}\"\"\"
+"""
+
         prompt = f"""
 TARGET ROLE: {role}
 INTERVIEW DURATION: {duration_minutes} minutes
@@ -78,13 +92,31 @@ JOB DESCRIPTION:
 
 CANDIDATE RESUME:
 \"\"\"{resume_summary}\"\"\"
-
+{memory_block}
 Generate the complete interview plan in JSON format.
 """
 
         # Determine sensible fallback plan if LLM is unavailable
         default_skills = self._get_default_skills_for_role(role)
         target_questions = max(5, min(12, int(duration_minutes / 3.5)))
+        fallback_difficulty = 2
+        fallback_strategy = f"Targeted assessment for {role} focusing on fundamental depth, practical scenario problem solving, and architecture."
+
+        if candidate_memory and candidate_memory.total_past_interviews > 0:
+            # Nudge difficulty from past performance/trend
+            if candidate_memory.avg_overall_score >= 7.5 or candidate_memory.trend_direction == "improving":
+                fallback_difficulty = 3
+            # Boost priority of skills that were consistently weak in past interviews
+            default_skills = [
+                (name, min(1.0, priority + 0.1) if name in candidate_memory.recurring_weak_skills else priority)
+                for name, priority in default_skills
+            ]
+            fallback_strategy = (
+                f"Targeted assessment for {role}, informed by {candidate_memory.total_past_interviews} prior "
+                f"interview(s) (avg {candidate_memory.avg_overall_score}/10, trend: {candidate_memory.trend_direction}). "
+                f"Re-probing recurring weak areas while building on demonstrated strengths."
+            )
+
         default_plan_data = {
             "role": role,
             "skills": [{"name": s[0], "priority": s[1]} for s in default_skills],
@@ -95,7 +127,7 @@ Generate the complete interview plan in JSON format.
                 "System Design",
                 "Behavioral"
             ],
-            "initial_difficulty": 2,
+            "initial_difficulty": fallback_difficulty,
             "total_target_questions": target_questions,
             "stage_distribution": {
                 "Technical Fundamentals": 0.25,
@@ -104,7 +136,7 @@ Generate the complete interview plan in JSON format.
                 "System Design": 0.15,
                 "Behavioral": 0.10
             },
-            "strategy_summary": f"Targeted assessment for {role} focusing on fundamental depth, practical scenario problem solving, and architecture."
+            "strategy_summary": fallback_strategy
         }
 
         raw_result = self.llm.generate_json(

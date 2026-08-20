@@ -42,6 +42,21 @@ class SkillPriority(BaseModel):
     mastery_count: int = 0
 
 
+class CandidateMemory(BaseModel):
+    """Aggregated long-term memory of a candidate's past interviews, built from
+    their historical scorecards. None of this is guessed — it's derived from
+    the candidate's own prior sessions stored in Supabase."""
+    total_past_interviews: int = 0
+    avg_overall_score: float = 0.0
+    recurring_weak_skills: List[str] = Field(default_factory=list)
+    recurring_strong_skills: List[str] = Field(default_factory=list)
+    last_role: Optional[str] = None
+    last_recommendation: Optional[str] = None
+    score_trend: List[float] = Field(default_factory=list)
+    trend_direction: str = "stable"  # "improving" | "declining" | "stable"
+    summary_text: str = ""
+
+
 class InterviewPlan(BaseModel):
     role: str
     skills: List[SkillPriority] = Field(default_factory=list)
@@ -142,6 +157,7 @@ class CandidateState(BaseModel):
     interview_plan: Optional[InterviewPlan] = None
     resume_summary: Optional[Dict[str, Any]] = None
     job_description: Optional[str] = None
+    candidate_memory: Optional[CandidateMemory] = None
 
 
 class EvidenceItem(BaseModel):

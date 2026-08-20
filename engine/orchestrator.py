@@ -17,6 +17,7 @@ from .question_generator import InterviewerAgent
 from .anti_repetition import AntiRepetitionEngine
 from .state_manager import CandidateStateManager
 from .report_generator import InterviewReportGenerator
+from .candidate_memory import CandidateMemoryManager
 from .llm_client import get_llm_client, LLMClient
 
 logger = logging.getLogger("adaptive_engine.orchestrator")
@@ -36,6 +37,7 @@ class InterviewOrchestrator:
         self.question_generator = InterviewerAgent(self.llm, self.anti_repetition)
         self.state_manager = CandidateStateManager(supabase_client)
         self.report_generator = InterviewReportGenerator(self.llm)
+        self.memory_manager = CandidateMemoryManager(supabase_client)
 
     def create_interview(
         self,
@@ -50,13 +52,20 @@ class InterviewOrchestrator:
         """Creates an interview session, generates the interview plan, and initializes state."""
         interview_id = str(uuid.uuid4())
 
+        # Pull long-term candidate memory from past interview scorecards (None for first-timers)
+        candidate_memory = self.memory_manager.get_candidate_memory(
+            user_id=user_id,
+            current_role=role
+        )
+
         plan = self.planner.create_plan(
             role=role,
             job_description=job_description,
             resume_text=resume_text,
             resume_structured=resume_structured,
             duration_minutes=duration_minutes,
-            interview_type=interview_type
+            interview_type=interview_type,
+            candidate_memory=candidate_memory
         )
 
         state = self.state_manager.create_initial_state(
@@ -66,7 +75,8 @@ class InterviewOrchestrator:
             job_description=job_description,
             resume_summary=resume_structured,
             user_id=user_id,
-            interview_type=interview_type
+            interview_type=interview_type,
+            candidate_memory=candidate_memory
         )
 
         return state

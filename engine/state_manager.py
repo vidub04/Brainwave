@@ -11,7 +11,8 @@ from .models import (
     AdaptationAction,
     QuestionItem,
     DecisionLogEntry,
-    InterviewHistoryTurn
+    InterviewHistoryTurn,
+    CandidateMemory
 )
 
 logger = logging.getLogger("adaptive_engine.state_manager")
@@ -97,7 +98,8 @@ class CandidateStateManager:
         job_description: Optional[str] = None,
         resume_summary: Optional[Dict[str, Any]] = None,
         user_id: Optional[str] = None,
-        interview_type: str = "Standard"
+        interview_type: str = "Standard",
+        candidate_memory: Optional[CandidateMemory] = None
     ) -> CandidateState:
         """Initializes state from an InterviewPlan."""
         total_q = plan.total_target_questions or 8
@@ -130,7 +132,8 @@ class CandidateStateManager:
             decision_logs=[],
             interview_plan=plan,
             resume_summary=resume_summary,
-            job_description=job_description
+            job_description=job_description,
+            candidate_memory=candidate_memory
         )
 
         self.save_state(state)

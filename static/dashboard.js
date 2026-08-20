@@ -37,16 +37,63 @@ const CATEGORY_COLORS = {
 
     const data = await res.json();
     const scorecards = data.scorecards || [];
+    const candidateMemory = data.candidate_memory || null;
 
     if (scorecards.length === 0) {
         document.getElementById("emptyState").classList.remove("hidden");
         return;
     }
 
+    renderMemoryPanel(candidateMemory);
     renderSummary(scorecards);
     renderChart(scorecards);
     renderSessionTable(scorecards);
 })();
+
+function renderMemoryPanel(memory) {
+    if (!memory || !memory.total_past_interviews) return;
+
+    const el = document.getElementById("memoryPanel");
+    el.classList.remove("hidden");
+
+    const trendLabel = {
+        improving: "↑ Improving",
+        declining: "↓ Declining",
+        stable: "→ Stable"
+    }[memory.trend_direction] || "→ Stable";
+
+    const trendClass = {
+        improving: "trend-up",
+        declining: "trend-down",
+        stable: "trend-flat"
+    }[memory.trend_direction] || "trend-flat";
+
+    const weakChips = (memory.recurring_weak_skills || [])
+        .map(s => `<span class="skill-chip weak">${CATEGORY_LABELS[s] || s}</span>`)
+        .join("");
+    const strongChips = (memory.recurring_strong_skills || [])
+        .map(s => `<span class="skill-chip strong">${CATEGORY_LABELS[s] || s}</span>`)
+        .join("");
+
+    el.innerHTML = `
+        <div class="memory-header">
+            <h3>What We Remember About You</h3>
+            <span class="card-subtitle">Based on ${memory.total_past_interviews} past interview${memory.total_past_interviews === 1 ? "" : "s"}</span>
+        </div>
+        <div class="memory-body">
+            <div class="memory-stat">
+                <div class="summary-value">${memory.avg_overall_score}/10</div>
+                <div class="summary-label">Historical Average</div>
+            </div>
+            <div class="memory-stat">
+                <div class="summary-value ${trendClass}">${trendLabel}</div>
+                <div class="summary-label">Trend</div>
+            </div>
+        </div>
+        ${weakChips ? `<div class="memory-skills"><span class="memory-skills-label">Recurring weak areas:</span> ${weakChips}</div>` : ""}
+        ${strongChips ? `<div class="memory-skills"><span class="memory-skills-label">Consistently strong:</span> ${strongChips}</div>` : ""}
+    `;
+}
 
 function average(scorecards, key) {
     const values = scorecards.map(s => Number(s[key]) || 0);

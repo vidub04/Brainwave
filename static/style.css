@@ -1519,6 +1519,72 @@ body.login-page {
     color: var(--text-muted);
 }
 
+/* Long-term Candidate Memory Panel */
+.memory-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.memory-header h3 {
+    font-size: var(--font-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.memory-body {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+}
+
+.memory-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.memory-skills {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.memory-skills-label {
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: var(--font-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.skill-chip {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-xs);
+    font-weight: 600;
+}
+
+.skill-chip.weak {
+    background: rgba(248, 113, 113, 0.12);
+    color: #f87171;
+}
+
+.skill-chip.strong {
+    background: rgba(52, 211, 153, 0.12);
+    color: #34d399;
+}
+
 /* Chart Card */
 .chart-card {
     background: var(--bg-card);

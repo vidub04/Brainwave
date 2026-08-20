@@ -10,6 +10,7 @@ from .models import (
     DecisionLogEntry,
     EvidenceItem,
     PreparationPlan,
+    CandidateMemory,
     CreateInterviewRequest,
     StartInterviewResponse,
     SubmitAnswerRequest,
@@ -22,6 +23,7 @@ from .question_generator import InterviewerAgent
 from .anti_repetition import AntiRepetitionEngine
 from .state_manager import CandidateStateManager, SkillTracker
 from .report_generator import InterviewReportGenerator
+from .candidate_memory import CandidateMemoryManager
 from .orchestrator import InterviewOrchestrator, get_orchestrator
 
 __all__ = [
@@ -36,6 +38,7 @@ __all__ = [
     "DecisionLogEntry",
     "EvidenceItem",
     "PreparationPlan",
+    "CandidateMemory",
     "CreateInterviewRequest",
     "StartInterviewResponse",
     "SubmitAnswerRequest",
@@ -48,6 +51,7 @@ __all__ = [
     "CandidateStateManager",
     "SkillTracker",
     "InterviewReportGenerator",
+    "CandidateMemoryManager",
     "InterviewOrchestrator",
     "get_orchestrator",
 ]
