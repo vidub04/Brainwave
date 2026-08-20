@@ -8,6 +8,7 @@ from .models import (
 )
 from .llm_client import get_llm_client, LLMClient
 from .anti_repetition import AntiRepetitionEngine
+from .coding_bank import get_coding_question
 
 logger = logging.getLogger("adaptive_engine.question_generator")
 
@@ -50,6 +51,37 @@ class InterviewerAgent:
         self.llm = llm_client or get_llm_client()
         self.anti_repetition = anti_repetition or AntiRepetitionEngine()
 
+    def _generate_coding_question(self, state, decision, target_skill, target_diff):
+        bank_q = get_coding_question(
+            skill=target_skill,
+            role=state.role,
+            difficulty=target_diff,
+            exclude_ids=state.used_coding_question_ids
+        )
+        if not bank_q:
+            return None  # falls through to LLM-generated question instead
+
+        state.used_coding_question_ids.append(bank_q.id)
+
+        return QuestionItem(
+            question=bank_q.prompt,
+            category="Problem Solving & Coding",
+            skill=bank_q.skill,
+            difficulty=bank_q.difficulty,
+            type=QuestionType.CODING,
+            expected_concepts=bank_q.expected_concepts,
+            reason=f"Bank coding assessment: {bank_q.title}.",
+            why_this_question=decision.get("why_this_question") or f"Let's see how you implement {bank_q.title}.",
+            speaker="Alex",
+            requires_code=True,
+            coding_question_id=bank_q.id,
+            function_signature=bank_q.function_signature,
+            starter_code=bank_q.starter_code,
+            visible_test_cases=[
+                tc.model_dump() for tc in bank_q.test_cases if not tc.is_hidden
+            ]
+        )    
+
     def generate_question(
         self,
         state: CandidateState,
@@ -65,6 +97,14 @@ class InterviewerAgent:
         target_diff = int(decision.get("new_difficulty", state.current_difficulty))
         why_reason = decision.get("why_this_question", "")
         decision_reasoning = decision.get("internal_reasoning", "")
+
+        ##coding round
+
+        is_coding_stage = "coding" in target_stage.lower() or "problem solving" in target_stage.lower()
+        if is_coding_stage and action != AdaptationAction.FOLLOW_UP:
+            coding_item = self._generate_coding_question(state, decision, target_skill, target_diff)
+            if coding_item:
+                return coding_item
 
         is_behavioral_stage = "behavioral" in target_stage.lower() or "culture" in target_stage.lower()
         speaker = "Ricky" if is_behavioral_stage else "Alex"

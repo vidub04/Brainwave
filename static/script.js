@@ -266,6 +266,27 @@ async function sendPrompt() {
             updateStageBadge(data.current_stage);
         }
 
+        // inside sendPrompt(), after receiving `data` from /answer:
+        if (data.execution_result) {
+            appendExecutionResultCard(data.execution_result);
+        }
+
+        function appendExecutionResultCard(exec) {
+            const chatBox = document.getElementById("chatBox");
+            const rows = exec.results.map(r => `
+                <div class="test-case-row ${r.passed ? 'pass' : 'fail'}">
+                    ${r.passed ? "✅" : "❌"} Input: ${JSON.stringify(r.input_args)} → 
+                    Expected: ${JSON.stringify(r.expected_output)}, Got: ${JSON.stringify(r.actual_output)}
+                    ${r.error ? `<span class="test-error">${escapeHtml(r.error)}</span>` : ""}
+                </div>
+            `).join("");
+            chatBox.innerHTML += `
+            <div class="execution-result-card">
+                <strong>${exec.passed_count}/${exec.total_count} test cases passed</strong>
+                ${exec.runtime_error ? `<div class="test-error">${escapeHtml(exec.runtime_error)}</div>` : rows}
+            </div>`;
+        }
+
         // Check if interview completed
         if (data.is_completed) {
             currentQuestionIndex = totalQuestions;
@@ -362,9 +383,16 @@ function appendBotQuestion(qItem) {
     `;
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    if (qItem.requires_code) {
-        toggleCodeEditorMode(true);
+        if (qItem.requires_code) {
+            toggleCodeEditorMode(true);
+            if (qItem.starter_code) {
+                document.getElementById("codeInput").value = qItem.starter_code;
+            }
+            if (qItem.visible_test_cases && qItem.visible_test_cases.length) {
+                renderVisibleTestCases(qItem.visible_test_cases);
+            }
     }
+
 
     speakText(qItem.question, speaker);
 }

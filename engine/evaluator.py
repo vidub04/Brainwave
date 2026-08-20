@@ -3,6 +3,7 @@ from typing import Optional, List
 from .models import EvaluationResult, QuestionItem
 from .llm_client import get_llm_client, LLMClient
 
+
 logger = logging.getLogger("adaptive_engine.evaluator")
 
 EVALUATOR_SYSTEM_PROMPT = """You are a rigorous, objective Technical Interview Evaluation Agent.
@@ -48,7 +49,8 @@ class EvaluationAgent:
         question: QuestionItem,
         candidate_answer: str,
         role: str = "Software Engineer",
-        code_submission: Optional[str] = None
+        code_submission: Optional[str] = None,
+        execution_result=None
     ) -> EvaluationResult:
         """Runs the Evaluation Agent on the candidate's answer."""
         expected_str = ", ".join(question.expected_concepts) if question.expected_concepts else "Core principles"
@@ -57,6 +59,15 @@ class EvaluationAgent:
         if code_submission:
             user_content += f"\n\nCandidate's Code Submission:\n```\n{code_submission}\n```"
 
+        execution_block = ""
+        if execution_result:
+            execution_block = f"""
+    CODE EXECUTION RESULTS (ground truth from actually running the code):
+    - Passed {execution_result.passed_count}/{execution_result.total_count} test cases
+    - Runtime error: {execution_result.runtime_error or 'None'}
+    Trust these results over your own reading of the code for correctness.
+    """
+
         prompt = f"""
 TARGET ROLE: {role}
 QUESTION CATEGORY: {question.category}
@@ -64,10 +75,12 @@ SKILL BEING TESTED: {question.skill}
 DIFFICULTY LEVEL: {question.difficulty} / 5
 EXPECTED CONCEPTS: {expected_str}
 
+
 QUESTION ASKED:
 \"\"\"{question.question}\"\"\"
 
 {user_content}
+{execution_block}
 
 Evaluate the candidate's response rigorously.
 """
@@ -137,6 +150,11 @@ Evaluate the candidate's response rigorously.
                 conf_val = max(0.1, min(1.0, float(conf)))
             except (ValueError, TypeError):
                 conf_val = 0.85
+
+            if execution_result and execution_result.total_count > 0:
+                pass_rate = execution_result.passed_count / execution_result.total_count
+                deterministic_score = round(pass_rate * 10.0, 1)
+                tech = round(0.7 * deterministic_score + 0.3 * tech, 1)  # ground truth dominates
 
             missing = [str(x) for x in raw_eval.get("missing_concepts", []) if isinstance(x, (str, int, float))]
             strengths = [str(x) for x in raw_eval.get("strengths", []) if isinstance(x, (str, int, float))]

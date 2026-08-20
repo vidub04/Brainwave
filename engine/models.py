@@ -56,7 +56,44 @@ class CandidateMemory(BaseModel):
     trend_direction: str = "stable"  # "improving" | "declining" | "stable"
     summary_text: str = ""
 
+##coding round
 
+class CodingTestCase(BaseModel):
+    input_args: List[Any]
+    expected_output: Any
+    is_hidden: bool = False  # hidden cases aren't shown to the candidate
+
+
+class CodingQuestion(BaseModel):
+    id: str
+    skill: str
+    role_tags: List[str] = Field(default_factory=list)
+    difficulty: int = Field(default=3, ge=1, le=5)
+    title: str
+    prompt: str
+    function_name: str
+    function_signature: str
+    starter_code: str
+    test_cases: List[CodingTestCase]
+    expected_concepts: List[str] = Field(default_factory=list)
+
+
+class TestCaseResult(BaseModel):
+    input_args: List[Any]
+    expected_output: Any
+    actual_output: Any = None
+    passed: bool = False
+    error: Optional[str] = None
+
+
+class CodeExecutionResult(BaseModel):
+    all_passed: bool = False
+    passed_count: int = 0
+    total_count: int = 0
+    results: List[TestCaseResult] = Field(default_factory=list)
+    runtime_error: Optional[str] = None
+
+    
 class InterviewPlan(BaseModel):
     role: str
     skills: List[SkillPriority] = Field(default_factory=list)
@@ -100,6 +137,10 @@ class QuestionItem(BaseModel):
     why_this_question: str = ""
     speaker: str = "Alex"
     requires_code: bool = False
+    coding_question_id: Optional[str] = None
+    function_signature: Optional[str] = None
+    starter_code: Optional[str] = None
+    visible_test_cases: List[Dict[str, Any]] = Field(default_factory=list)
 
 
 class DecisionLogEntry(BaseModel):
@@ -139,6 +180,7 @@ class CandidateState(BaseModel):
     questions_remaining: int = 8
     time_remaining_seconds: int = 1800
     is_completed: bool = False
+    used_coding_question_ids: List[str] = Field(default_factory=list)
 
     skill_scores: Dict[str, float] = Field(default_factory=dict)
     skill_priorities: Dict[str, float] = Field(default_factory=dict)
@@ -233,3 +275,5 @@ class SubmitAnswerResponse(BaseModel):
     questions_remaining: int
     skill_scores: Dict[str, float]
     report: Optional[InterviewReport] = None
+    execution_result: Optional[CodeExecutionResult] = None
+

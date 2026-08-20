@@ -19,6 +19,8 @@ from .state_manager import CandidateStateManager
 from .report_generator import InterviewReportGenerator
 from .candidate_memory import CandidateMemoryManager
 from .llm_client import get_llm_client, LLMClient
+from .code_executor import CodeExecutor
+from .coding_bank import get_coding_question_by_id
 
 logger = logging.getLogger("adaptive_engine.orchestrator")
 
@@ -38,6 +40,8 @@ class InterviewOrchestrator:
         self.state_manager = CandidateStateManager(supabase_client)
         self.report_generator = InterviewReportGenerator(self.llm)
         self.memory_manager = CandidateMemoryManager(supabase_client)
+        self.code_executor = CodeExecutor()
+
 
     def create_interview(
         self,
@@ -138,6 +142,12 @@ class InterviewOrchestrator:
                 "report": report
             }
 
+        execution_result = None
+        if current_q.requires_code and current_q.coding_question_id and code_submission:
+            bank_q = get_coding_question_by_id(current_q.coding_question_id)
+            if bank_q:
+                execution_result = self.code_executor.run(code_submission, bank_q)
+
         current_q = state.current_question or QuestionItem(
             question="Tell me about your technical background.",
             category="Technical Fundamentals",
@@ -150,7 +160,8 @@ class InterviewOrchestrator:
             question=current_q,
             candidate_answer=candidate_answer,
             role=state.role,
-            code_submission=code_submission
+            code_submission=code_submission,
+            execution_result=execution_result
         )
 
         # Step 2: Decide next action
@@ -184,7 +195,8 @@ class InterviewOrchestrator:
                 "questions_asked": state.questions_asked,
                 "questions_remaining": 0,
                 "skill_scores": state.skill_scores,
-                "report": report
+                "report": report,
+                "execution_result": execution_result
             }
 
         # Step 4: Generate next question
