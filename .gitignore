@@ -3,3 +3,4 @@ venv/
 __pycache__/
 *.pyc
 static/config.js
+add_questions.py

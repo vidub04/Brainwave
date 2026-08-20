@@ -1,6 +1,8 @@
 from typing import List, Optional
 from .models import CodingTestCase, CodingQuestion
 
+
+##question bank default
 CODING_QUESTION_BANK: List[CodingQuestion] = [
     CodingQuestion(
         id="two_sum",
@@ -45,6 +47,55 @@ CODING_QUESTION_BANK: List[CodingQuestion] = [
 ]
 
 
+
+##calling coding questions
+
+def get_coding_question(
+    skill: str,
+    role: str,
+    difficulty: int,
+    exclude_ids: List[str],
+    supabase_client=None
+) -> Optional[CodingQuestion]:
+
+    # Start with fallback questions
+    question_bank = CODING_QUESTION_BANK.copy()
+
+    # Try loading questions from Supabase
+    if supabase_client:
+        supabase_questions = load_bank_from_supabase(supabase_client)
+
+        # If Supabase worked, use those questions
+        if supabase_questions:
+            question_bank = supabase_questions
+
+    candidates = [
+        q for q in question_bank
+        if q.id not in exclude_ids
+        and (not q.role_tags or role in q.role_tags)
+    ]
+
+    # If no role match, ignore role
+    if not candidates:
+        candidates = [
+            q for q in question_bank
+            if q.id not in exclude_ids
+        ]
+
+    if not candidates:
+        return None
+
+    # Closest difficulty first, then skill match
+    candidates.sort(
+        key=lambda q: (
+            abs(q.difficulty - difficulty),
+            skill.lower() not in q.skill.lower()
+        )
+    )
+
+    return candidates[0]
+
+'''
 def get_coding_question(
     skill: str,
     role: str,
@@ -69,9 +120,83 @@ def get_coding_question(
 def get_coding_question_by_id(qid: str) -> Optional[CodingQuestion]:
     return next((q for q in CODING_QUESTION_BANK if q.id == qid), None)
 
+'''
+
+def get_coding_question_by_id(
+    qid: str,
+    supabase_client=None
+) -> Optional[CodingQuestion]:
+
+    # Try Supabase first
+    if supabase_client:
+        try:
+            row = (
+                supabase_client
+                .table("coding_questions")
+                .select("*")
+                .eq("id", qid)
+                .maybe_single()
+                .execute()
+                .data
+            )
+
+            if row:
+                return CodingQuestion(
+                    id=row["id"],
+                    skill=row["skill"],
+                    role_tags=row.get("role_tags", []),
+                    difficulty=row.get("difficulty", 3),
+                    title=row["title"],
+                    prompt=row["prompt"],
+                    function_name=row["function_name"],
+                    function_signature=row["function_signature"],
+                    starter_code=row["starter_code"],
+                    test_cases=[
+                        CodingTestCase(**tc)
+                        for tc in row.get("test_cases", [])
+                    ],
+                    expected_concepts=row.get("expected_concepts", [])
+                )
+
+        except Exception as e:
+            print(f"Failed to fetch coding question from Supabase: {e}")
+
+    # Fallback
+    return next(
+        (q for q in CODING_QUESTION_BANK if q.id == qid),
+        None
+    )
+
 def load_bank_from_supabase(supabase_client) -> List[CodingQuestion]:
     try:
-        rows = supabase_client.table("coding_questions").select("*").execute().data or []
-        return [CodingQuestion(**{**r, "test_cases": [CodingTestCase(**tc) for tc in r["test_cases"]]}) for r in rows]
-    except Exception:
+        rows = (
+            supabase_client
+            .table("coding_questions")
+            .select("*")
+            .execute()
+            .data or []
+        )
+
+        return [
+            CodingQuestion(
+                id=r["id"],
+                skill=r["skill"],
+                role_tags=r.get("role_tags", []),
+                difficulty=r.get("difficulty", 3),
+                title=r["title"],
+                prompt=r["prompt"],
+                function_name=r["function_name"],
+                function_signature=r["function_signature"],
+                starter_code=r["starter_code"],
+                test_cases=[
+                    CodingTestCase(**tc)
+                    for tc in r.get("test_cases", [])
+                ],
+                expected_concepts=r.get("expected_concepts", []),
+            )
+            for r in rows
+        ]
+
+    except Exception as e:
+        print(f"Failed to load coding questions from Supabase: {e}")
         return []
