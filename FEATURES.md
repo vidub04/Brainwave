@@ -4,4 +4,4 @@
 []rag  
 []integrity detection  
 []bias evaluation  
-[]career learning agent
+[]career learning agents
