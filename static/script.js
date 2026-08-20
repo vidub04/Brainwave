@@ -388,9 +388,9 @@ function appendBotQuestion(qItem) {
             if (qItem.starter_code) {
                 document.getElementById("codeInput").value = qItem.starter_code;
             }
-            if (qItem.visible_test_cases && qItem.visible_test_cases.length) {
+            /*if (qItem.visible_test_cases && qItem.visible_test_cases.length) {
                 renderVisibleTestCases(qItem.visible_test_cases);
-            }
+            }*/
     }
 
 
