@@ -225,6 +225,7 @@ async def api_submit_answer(
     updates candidate state & skill graph, and produces the next question or final report.
     """
     try:
+        
         user_id = getattr(user, "id", None)
 
         # Save user answer to Supabase

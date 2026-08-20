@@ -142,11 +142,19 @@ class InterviewOrchestrator:
                 "report": report
             }
 
+        current_q = state.current_question or QuestionItem(
+                    question="Tell me about your technical background.",
+                    category="Technical Fundamentals",
+                    skill="Core Programming",
+                    difficulty=state.current_difficulty
+                )
+
         execution_result = None
         if current_q.requires_code and current_q.coding_question_id and code_submission:
             bank_q = get_coding_question_by_id(current_q.coding_question_id)
             if bank_q:
                 execution_result = self.code_executor.run(code_submission, bank_q)
+        '''
 
         current_q = state.current_question or QuestionItem(
             question="Tell me about your technical background.",
@@ -154,6 +162,8 @@ class InterviewOrchestrator:
             skill="Core Programming",
             difficulty=state.current_difficulty
         )
+
+        '''
 
         # Step 1: Evaluate
         evaluation = self.evaluator.evaluate(
