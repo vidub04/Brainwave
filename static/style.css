@@ -2995,9 +2995,7 @@ textarea::placeholder {
     .dot-grid-bg { animation: none; }
 }
 
-/* ---------- Subtle Twinkling Stars ---------- */
-
-/* ---------- Subtle Twinkling Stars ---------- */
+/* ---------- Twinkling Stars ---------- */
 
 .stars {
     position: fixed;
@@ -3006,48 +3004,89 @@ textarea::placeholder {
     pointer-events: none;
 }
 
+/* Main star layer */
 .stars::before {
     content: "";
     position: absolute;
     inset: 0;
 
     background-image:
-        radial-gradient(circle at 8% 15%, rgba(255,255,255,0.7) 1px, transparent 1.5px),
-        radial-gradient(circle at 18% 72%, rgba(255,255,255,0.5) 1px, transparent 1.5px),
-        radial-gradient(circle at 28% 35%, rgba(255,255,255,0.6) 1px, transparent 1.5px),
-        radial-gradient(circle at 38% 85%, rgba(255,255,255,0.45) 1px, transparent 1.5px),
-        radial-gradient(circle at 48% 20%, rgba(255,255,255,0.6) 1px, transparent 1.5px),
-        radial-gradient(circle at 58% 60%, rgba(255,255,255,0.5) 1px, transparent 1.5px),
-        radial-gradient(circle at 68% 12%, rgba(255,255,255,0.7) 1px, transparent 1.5px),
-        radial-gradient(circle at 78% 78%, rgba(255,255,255,0.45) 1px, transparent 1.5px),
-        radial-gradient(circle at 88% 40%, rgba(255,255,255,0.6) 1px, transparent 1.5px),
-        radial-gradient(circle at 95% 90%, rgba(255,255,255,0.5) 1px, transparent 1.5px);
+        radial-gradient(circle at 5% 12%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+        radial-gradient(circle at 11% 68%, rgba(255,255,255,.45) .6px, transparent 1.2px),
+        radial-gradient(circle at 18% 32%, rgba(255,255,255,.65) .7px, transparent 1.3px),
+        radial-gradient(circle at 24% 86%, rgba(255,255,255,.4) .6px, transparent 1.2px),
+        radial-gradient(circle at 31% 18%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+        radial-gradient(circle at 37% 57%, rgba(255,255,255,.5) .6px, transparent 1.2px),
+        radial-gradient(circle at 43% 91%, rgba(255,255,255,.45) .7px, transparent 1.3px),
+        radial-gradient(circle at 49% 38%, rgba(255,255,255,.6) .7px, transparent 1.3px),
+        radial-gradient(circle at 56% 12%, rgba(255,255,255,.45) .6px, transparent 1.2px),
+        radial-gradient(circle at 62% 73%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+        radial-gradient(circle at 68% 27%, rgba(255,255,255,.4) .6px, transparent 1.2px),
+        radial-gradient(circle at 74% 92%, rgba(255,255,255,.6) .7px, transparent 1.3px),
+        radial-gradient(circle at 81% 48%, rgba(255,255,255,.5) .6px, transparent 1.2px),
+        radial-gradient(circle at 87% 15%, rgba(255,255,255,.65) .7px, transparent 1.3px),
+        radial-gradient(circle at 93% 63%, rgba(255,255,255,.45) .6px, transparent 1.2px);
 
-    animation: stars-twinkle 5s ease-in-out infinite alternate;
+    animation: twinkle-one 4s ease-in-out infinite alternate;
 }
 
+/* Second layer with different timing */
 .stars::after {
     content: "";
     position: absolute;
     inset: 0;
 
     background-image:
-        radial-gradient(circle at 15% 45%, rgba(255,255,255,0.35) 1.5px, transparent 2px),
-        radial-gradient(circle at 35% 10%, rgba(255,255,255,0.3) 1.5px, transparent 2px),
-        radial-gradient(circle at 55% 90%, rgba(255,255,255,0.35) 1.5px, transparent 2px),
-        radial-gradient(circle at 75% 30%, rgba(255,255,255,0.3) 1.5px, transparent 2px),
-        radial-gradient(circle at 90% 65%, rgba(255,255,255,0.35) 1.5px, transparent 2px);
+        radial-gradient(circle at 8% 42%, rgba(255,255,255,.45) .6px, transparent 1.2px),
+        radial-gradient(circle at 15% 91%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+        radial-gradient(circle at 27% 61%, rgba(255,255,255,.4) .6px, transparent 1.2px),
+        radial-gradient(circle at 34% 43%, rgba(255,255,255,.6) .7px, transparent 1.3px),
+        radial-gradient(circle at 41% 76%, rgba(255,255,255,.45) .6px, transparent 1.2px),
+        radial-gradient(circle at 53% 54%, rgba(255,255,255,.5) .7px, transparent 1.3px),
+        radial-gradient(circle at 59% 88%, rgba(255,255,255,.4) .6px, transparent 1.2px),
+        radial-gradient(circle at 66% 46%, rgba(255,255,255,.55) .7px, transparent 1.3px),
+        radial-gradient(circle at 72% 16%, rgba(255,255,255,.45) .6px, transparent 1.2px),
+        radial-gradient(circle at 79% 76%, rgba(255,255,255,.6) .7px, transparent 1.3px),
+        radial-gradient(circle at 85% 36%, rgba(255,255,255,.4) .6px, transparent 1.2px),
+        radial-gradient(circle at 91% 84%, rgba(255,255,255,.5) .7px, transparent 1.3px);
 
-    animation: stars-twinkle 7s ease-in-out infinite alternate-reverse;
+    animation: twinkle-two 6s ease-in-out infinite alternate;
 }
 
-@keyframes stars-twinkle {
-    from {
-        opacity: 0.35;
+/* Different twinkle patterns */
+@keyframes twinkle-one {
+    0% {
+        opacity: 0.15;
     }
 
-    to {
-        opacity: 0.8;
+    30% {
+        opacity: 0.45;
+    }
+
+    60% {
+        opacity: 0.25;
+    }
+
+    100% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes twinkle-two {
+    0% {
+        opacity: 0.6;
+    }
+
+    40% {
+        opacity: 0.2;
+    }
+
+    70% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 0.15;
     }
 }
 
