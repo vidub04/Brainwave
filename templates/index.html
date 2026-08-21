@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RoleReady · Adaptive AI Interview Engine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/static/style.css?v=4">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=6">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<!-- Landing / Setup Screen -->
+<!-- Landing / Setup Command Center -->
 <section id="landing" class="landing">
     <div class="hero">
-        <div class="hero-badge">⚡ Adaptive interview engine — evaluates, adapts, diagnoses in real time</div>
+        <div class="hero-badge">
+            <span class="term-live-dot"></span>
+            <span>Adaptive Interview Engine · Evaluates & Diagnoses in Real Time</span>
+        </div>
 
         <div class="logo-circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -23,14 +28,17 @@
             </svg>
         </div>
 
-        <h1>Anonymous mock interviews<br>that actually adapt to you</h1>
-        <p>No fixed script. RoleReady evaluates every answer, diagnoses missing concepts, shifts difficulty in real time, and hands you an evidence-backed report at the end.</p>
+        <h1>Autonomous mock interviews<br>calibrated to your depth</h1>
+        <p>No static question bank. RoleReady evaluates every answer, diagnoses missing concepts, shifts difficulty in real time, and delivers an evidence-backed readiness scorecard.</p>
 
         <div class="hero-action-card">
-            <div class="term-chrome" style="margin: -32px -32px 24px; border-radius: 16px 16px 0 0;">
+            <div class="term-chrome" style="margin: -24px -24px 20px; border-radius: 18px 18px 0 0;">
                 <div class="term-dots"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span></div>
-                <div class="term-tab">configure_interview.yml</div>
-                <div class="term-live"><span class="term-live-dot"></span>ready</div>
+                <div class="term-tab">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    <span>Interview Calibration</span>
+                </div>
+                <div class="term-live"><span class="term-live-dot"></span>Engine Ready</div>
             </div>
 
             <div class="form-group">
@@ -56,13 +64,16 @@
 
             <div class="form-row-2col">
                 <div class="form-group">
-                    <label for="durationSelect">Interview Duration</label>
+                    <label for="durationSelect">Session Duration</label>
                     <div class="select-container">
                         <select id="durationSelect">
-                            <option value="15">15 Minutes (Express - 5 Questions)</option>
-                            <option value="30" selected>30 Minutes (Standard - 8 Questions)</option>
-                            <option value="45">45 Minutes (Deep Dive - 11 Questions)</option>
+                            <option value="15">15 Minutes (Express · 5 Questions)</option>
+                            <option value="30" selected>30 Minutes (Standard · 8 Questions)</option>
+                            <option value="45">45 Minutes (Deep Dive · 11 Questions)</option>
                         </select>
+                        <span class="select-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
                     </div>
                 </div>
 
@@ -75,13 +86,16 @@
                             <option value="System Architecture Deep Dive">System Architecture Deep Dive</option>
                             <option value="Technical & Behavioral Leadership">Technical & Behavioral Leadership</option>
                         </select>
+                        <span class="select-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </span>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="label-with-action">
-                    <label for="resumeUploadInput">Upload Resume (PDF/DOCX)</label>
+                    <label for="resumeUploadInput">Upload Résumé (PDF/DOCX)</label>
                     <span id="resumeStatus" class="status-pill">Optional</span>
                 </div>
                 <div class="file-drop-zone" id="dropZone" onclick="document.getElementById('resumeUploadInput').click()">
@@ -90,15 +104,15 @@
                         <polyline points="17 8 12 3 7 8"/>
                         <line x1="12" y1="3" x2="12" y2="15"/>
                     </svg>
-                    <span id="fileNameDisplay">Click or drag & drop candidate resume here</span>
+                    <span id="fileNameDisplay">Click or drag & drop candidate résumé to tailor interview questions</span>
                     <input type="file" id="resumeUploadInput" accept=".pdf,.docx" style="display:none;" onchange="handleLandingResumeUpload(event)">
                 </div>
                 <div id="parsedSkillsPills" class="skills-pills-row hidden"></div>
             </div>
 
             <div class="form-group">
-                <label for="jdInput">Job Description (JD)</label>
-                <textarea id="jdInput" class="jd-textarea" placeholder="Paste target Job Description requirements here to calibrate skills and questions (optional)..."></textarea>
+                <label for="jdInput">Target Job Description (JD)</label>
+                <textarea id="jdInput" class="jd-textarea" placeholder="Paste job description requirements here to calibrate domain depth and questions (optional)..."></textarea>
             </div>
 
             <button id="startBtn" class="primary-start-btn">
@@ -108,8 +122,14 @@
         </div>
 
         <div class="hero-footer-links">
-            <a href="/dashboard">📊 View Performance Analytics & Past Scorecards</a>
-            <a href="/profile">👤 View Your Profile</a>
+            <a href="/dashboard">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Performance Analytics</span>
+            </a>
+            <a href="/profile">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Candidate Profile</span>
+            </a>
         </div>
     </div>
 </section>
@@ -137,7 +157,7 @@
 
         <div class="sidebar-title">Past Sessions</div>
         <div id="conversationList" class="conversation-list">
-            <p class="sidebar-empty">No past sessions</p>
+            <p class="sidebar-empty">No past sessions yet</p>
         </div>
 
         <div class="sidebar-footer">
@@ -176,12 +196,13 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     <span id="timer">00:00</span>
                 </span>
-                <span id="difficultyBadge" class="diff-badge diff-2">🔵 Level 2: Easy</span>
+                <span id="difficultyBadge" class="diff-badge diff-2">Level 2: Easy</span>
                 <button id="decisionLogToggleBtn" onclick="toggleDecisionDrawer()" class="judge-mode-btn" title="Inspect live agent reasoning logs">
-                    🛠️ Judge Decision Log
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>Judge Decision Log</span>
                 </button>
-                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" class="toolbar-btn" style="width:auto; padding:6px 12px;">🔇 Voice</button>
-                <a href="/profile" class="toolbar-btn" style="width:auto; padding:6px 12px; display:inline-flex; align-items:center; text-decoration:none;">👤 Profile</a>
+                <button id="voiceToggleBtn" onclick="toggleVoiceOutput()" class="toolbar-btn" style="width:auto; padding:6px 12px;">Voice Output</button>
+                <a href="/profile" class="toolbar-btn" style="width:auto; padding:6px 12px; display:inline-flex; align-items:center; text-decoration:none;">Profile</a>
                 <button onclick="signOut()" class="toolbar-btn logout-btn" style="width:auto; padding:6px 12px;">Log out</button>
             </div>
         </header>
@@ -222,12 +243,12 @@
                     <line x1="12" y1="19" x2="12" y2="23"/>
                     <line x1="8" y1="23" x2="16" y2="23"/>
                 </svg>
-                <span id="micBtnLabel">🎤 Start Voice Answer</span>
+                <span id="micBtnLabel">Voice Answer</span>
             </button>
 
             <button id="codeToggleBtn" class="toggle-code-btn" onclick="toggleCodeEditorMode()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                <span id="codeToggleLabel">💻 Add Code Solution</span>
+                <span id="codeToggleLabel">Add Code Solution</span>
             </button>
         </div>
 
@@ -264,7 +285,7 @@
     <div id="decisionLogDrawer" class="decision-drawer hidden">
         <div class="drawer-header">
             <div class="drawer-title">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Agent Decision Trajectory</span>
             </div>
             <button onclick="toggleDecisionDrawer()" class="close-drawer-btn">✕</button>
@@ -282,7 +303,7 @@
     <div class="report-card-modal">
         <div class="modal-header">
             <div>
-                <h2>🎓 Final Adaptive Interview Assessment</h2>
+                <h2>Final Adaptive Interview Assessment</h2>
                 <p id="reportRoleSubtitle">Candidate Performance & Technical Readiness Report</p>
             </div>
             <button onclick="closeReportModal()" class="close-modal-btn">✕</button>
@@ -303,32 +324,32 @@
 
             <!-- Skill Mastery Breakdown -->
             <div class="report-section">
-                <h3>📊 Skill Mastery Graph</h3>
+                <h3>Skill Mastery Graph</h3>
                 <div id="reportSkillBars" class="skill-bars-container"></div>
             </div>
 
             <!-- Strengths & Weaknesses -->
             <div class="report-grid-2col">
                 <div class="report-section">
-                    <h3 class="text-success">✅ Key Strengths</h3>
+                    <h3 class="text-success">Key Strengths</h3>
                     <ul id="reportStrengthsList" class="report-list strengths-list"></ul>
                 </div>
                 <div class="report-section">
-                    <h3 class="text-danger">⚠️ Diagnosed Growth Areas</h3>
+                    <h3 class="text-danger">Diagnosed Growth Areas</h3>
                     <ul id="reportWeaknessesList" class="report-list weaknesses-list"></ul>
                 </div>
             </div>
 
             <!-- Evidence-Backed Weakness Cards -->
             <div class="report-section">
-                <h3>🔍 Evidence-Backed Assessment</h3>
+                <h3>Evidence-Backed Assessment</h3>
                 <p class="section-subtext">Exact interview questions and candidate responses that informed the diagnosis:</p>
                 <div id="reportEvidenceContainer" class="evidence-cards-container"></div>
             </div>
 
             <!-- Actionable 7 / 14 / 30 Day Prep Roadmap -->
             <div class="report-section">
-                <h3>🚀 Personalized Preparation Roadmap</h3>
+                <h3>Personalized Preparation Roadmap</h3>
                 <div class="roadmap-grid">
                     <div class="roadmap-card day-7">
                         <h4>7-Day Quick Wins</h4>
@@ -347,7 +368,7 @@
         </div>
 
         <div class="modal-footer">
-            <button onclick="window.print()" class="secondary-btn">🖨️ Print / Save PDF</button>
+            <button onclick="window.print()" class="secondary-btn">Print / Save PDF</button>
             <button onclick="window.location.reload()" class="primary-btn">Start New Session</button>
         </div>
     </div>

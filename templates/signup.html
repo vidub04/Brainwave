@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign up · RoleReady</title>
+    <title>Create Account · RoleReady</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/static/style.css?v=4">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=6">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
@@ -22,18 +24,21 @@
                 </svg>
                 <span>RoleReady</span>
             </div>
-            <p class="login-subtitle">Create an account to start practicing anonymous, adaptive mock interviews.</p>
+            <p class="login-subtitle">Create your candidate profile to practice autonomous, adaptive technical mock interviews.</p>
         </header>
 
         <div class="login-form">
-            <div class="term-chrome" style="margin: -32px -32px 24px; border-radius: 16px 16px 0 0;">
+            <div class="term-chrome" style="margin: -24px -24px 20px; border-radius: 18px 18px 0 0;">
                 <div class="term-dots"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span></div>
-                <div class="term-tab">new_session.sh</div>
-                <div class="term-live"><span class="term-live-dot"></span>init</div>
+                <div class="term-tab">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                    <span>New Candidate Registration</span>
+                </div>
+                <div class="term-live"><span class="term-live-dot"></span>Secure</div>
             </div>
 
             <div class="form-group">
-                <label for="fullName">Full name <span class="optional-tag">(optional)</span></label>
+                <label for="fullName">Full Name <span class="optional-tag">(optional)</span></label>
                 <input
                     id="fullName"
                     type="text"
@@ -43,7 +48,7 @@
             </div>
 
             <div class="form-group">
-                <label for="email">Email address</label>
+                <label for="email">Email Address</label>
                 <input
                     id="email"
                     type="email"
@@ -65,7 +70,7 @@
             </div>
 
             <div class="form-group">
-                <label for="confirmPassword">Confirm password</label>
+                <label for="confirmPassword">Confirm Password</label>
                 <input
                     id="confirmPassword"
                     type="password"
@@ -77,15 +82,16 @@
 
             <div class="login-buttons">
                 <button id="signupBtn" class="btn-primary" style="flex: 1;" onclick="handleSignUp()">
-                    Create Account
+                    <span>Create Free Account</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
             </div>
 
             <p class="auth-switch-link">
-                Already have an account? <a href="/">Log in</a>
+                Already have an account? <a href="/">Sign in</a>
             </p>
 
-            <p id="authMsg" style="display:none; font-size: 0.85rem; margin-top: 12px; text-align: center;"></p>
+            <p id="authMsg" style="display:none;"></p>
 
         </div>
 

@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Profile · RoleReady</title>
+    <title>Candidate Profile · RoleReady</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/static/style.css?v=4">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=6">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -18,20 +20,26 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>
                 </svg>
-                <span>Your Profile</span>
+                <span>Candidate Profile</span>
             </div>
-            <span class="header-subtitle">Account details, résumé on file, and your interview stats</span>
+            <span class="header-subtitle">Account details, active résumé, and interview track record</span>
         </div>
-        <a href="/app" class="back-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            <span>Back to Interviews</span>
-        </a>
+        <div class="dashboard-header-actions">
+            <a href="/dashboard" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span>Analytics</span>
+            </a>
+            <a href="/app" class="back-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                <span>Back to Interviews</span>
+            </a>
+        </div>
     </header>
 
     <div class="dashboard-content">
 
         <p id="profileError" class="empty-state hidden">
-            Couldn't load your profile right now — try refreshing.
+            Couldn't load your candidate profile right now — please try refreshing the page.
         </p>
 
         <!-- Identity Card -->
@@ -65,7 +73,7 @@
         <div class="chart-card">
             <div class="card-header resume-card-header">
                 <div>
-                    <h3>Résumé on File</h3>
+                    <h3>Active Résumé</h3>
                     <span class="card-subtitle" id="resumeFileName">No résumé uploaded yet</span>
                 </div>
                 <div class="resume-upload-action">
@@ -78,7 +86,7 @@
             </div>
 
             <p id="resumeEmpty" class="empty-state">
-                Upload a résumé to have your candidate name, skills, and experience parsed automatically for smarter interview calibration.
+                Upload a résumé to automatically extract candidate experience, primary skills, and project keywords for personalized interview calibration.
             </p>
 
             <div id="resumeDetails" class="resume-details hidden">
@@ -100,12 +108,12 @@
                 <p id="resumeSummary" class="resume-summary-text"></p>
 
                 <div class="resume-block">
-                    <span class="memory-skills-label">Skills</span>
+                    <span class="memory-skills-label">Extracted Skills</span>
                     <div id="resumeSkills" class="skills-pills-row"></div>
                 </div>
 
                 <div class="resume-block">
-                    <span class="memory-skills-label">Education</span>
+                    <span class="memory-skills-label">Education &amp; Background</span>
                     <ul id="resumeEducation" class="resume-education-list"></ul>
                 </div>
             </div>

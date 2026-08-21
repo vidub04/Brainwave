@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Progress · RoleReady</title>
+    <title>Performance Analytics · RoleReady</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="/static/style.css?v=4">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=6">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -21,7 +23,7 @@
                 </svg>
                 <span>Performance Analytics</span>
             </div>
-            <span class="header-subtitle">Track your mock interview metrics and category score progression</span>
+            <span class="header-subtitle">Track your mock interview score progression and category depth</span>
         </div>
         <div class="dashboard-header-actions">
             <a href="/profile" class="back-link">
@@ -37,7 +39,7 @@
 
     <div id="dashboardContent" class="dashboard-content">
         <p id="emptyState" class="empty-state hidden">
-            No completed interviews yet — finish your first full session to start tracking progress here.
+            No completed interviews yet — complete your first full session to start tracking performance metrics and memory trends here.
         </p>
 
         <div id="memoryPanel" class="memory-panel hidden"></div>
@@ -46,8 +48,10 @@
 
         <div id="chartCard" class="chart-card hidden">
             <div class="card-header">
-                <h3>Score trend across sessions</h3>
-                <span class="card-subtitle mono-label">0–10 scale · per category</span>
+                <div>
+                    <h3>Score Trends Across Sessions</h3>
+                    <span class="card-subtitle">0–10 evaluation scale · tracked per competency category</span>
+                </div>
             </div>
             <div class="chart-wrapper">
                 <svg id="trendChart" viewBox="0 0 900 320" class="trend-chart"></svg>
@@ -57,15 +61,15 @@
 
         <div id="sessionTable" class="session-table hidden">
             <div class="table-header-block">
-                <h3>Past Interviews</h3>
-                <span class="card-subtitle">Detailed breakdown and hiring recommendation of completed sessions</span>
+                <h3>Past Interview Sessions</h3>
+                <span class="card-subtitle">Detailed breakdown and hiring recommendation of completed evaluations</span>
             </div>
             <div class="session-table-header">
                 <span>Session</span>
-                <span>Role</span>
+                <span>Target Role</span>
                 <span>Date</span>
                 <span>Score</span>
-                <span>Recommendation</span>
+                <span>Hiring Verdict</span>
             </div>
             <div id="sessionRows"></div>
         </div>
