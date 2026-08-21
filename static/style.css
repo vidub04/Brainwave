@@ -3089,135 +3089,226 @@ textarea::placeholder {
 }
 
 .bga-22 {
-  width: 100%;
-  min-height: 100vh;
-  min-height: 100svh;
-  display: block;
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  --bga-22-bg: oklch(0.11 0.03 268);
-  --bga-22-star: oklch(0.99 0.005 250);
-  --bga-22-acc: oklch(0.82 0.13 250);
-  background: var(--bga-22-bg);
-  color: oklch(0.97 0.008 250);
-  font-family: ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
-  -webkit-font-smoothing: antialiased;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+
+    --bga-22-bg: #07090e;
+    --bga-22-star: oklch(0.99 0.005 250);
+    --bga-22-acc: oklch(0.82 0.13 250);
+
+    background: var(--bga-22-bg);
+    color: white;
+
+    pointer-events: none;
+    z-index: 0;
 }
 
 .bga-22__void {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(130% 100% at 50% 108%,oklch(0.2 0.05 262),oklch(0.08 0.025 272) 68%);
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(
+            130% 100% at 50% 108%,
+            oklch(0.2 0.05 262),
+            oklch(0.08 0.025 272) 68%
+        );
 }
 
 .bga-22__nebula {
-  position: absolute;
-  inset: 0;
-  opacity: .5;
-  mix-blend-mode: screen;
-  filter: blur(46px);
-  background: radial-gradient(34% 30% at 22% 30%,oklch(0.5 0.18 300/.5),transparent 70%), radial-gradient(30% 26% at 74% 22%,oklch(0.48 0.16 220/.45),transparent 72%), radial-gradient(40% 30% at 58% 78%,oklch(0.44 0.14 340/.4),transparent 74%);
-  animation: bga-22-neb 70s ease-in-out infinite alternate;
+    position: absolute;
+    inset: 0;
+
+    opacity: .5;
+    mix-blend-mode: screen;
+    filter: blur(46px);
+
+    background:
+        radial-gradient(
+            34% 30% at 22% 30%,
+            oklch(0.5 0.18 300/.5),
+            transparent 70%
+        ),
+        radial-gradient(
+            30% 26% at 74% 22%,
+            oklch(0.48 0.16 220/.45),
+            transparent 72%
+        ),
+        radial-gradient(
+            40% 30% at 58% 78%,
+            oklch(0.44 0.14 340/.4),
+            transparent 74%
+        );
+
+    animation: bga-22-neb 70s ease-in-out infinite alternate;
 }
 
 @keyframes bga-22-neb {
-  to {
-    translate: 2% -2%;
-    scale: 1.12;
-  }
+    to {
+        translate: 2% -2%;
+        scale: 1.12;
+    }
 }
 
 .bga-22__stars {
-  position: absolute;
-  inset: -6%;
-  background-repeat: repeat;
+    position: absolute;
+    inset: -6%;
+    background-repeat: repeat;
 }
 
 .bga-22__stars--far {
-  opacity: .5;
-  background-image: radial-gradient(var(--bga-22-star) .6px,transparent .8px);
-  background-size: 61px 61px;
-  background-position: 14px 22px;
-  animation: bga-22-tw 7.5s ease-in-out infinite alternate,bga-22-drift 220s linear infinite;
+    opacity: .5;
+
+    background-image:
+        radial-gradient(
+            var(--bga-22-star) .6px,
+            transparent .8px
+        );
+
+    background-size: 61px 61px;
+    background-position: 14px 22px;
+
+    animation:
+        bga-22-tw 7.5s ease-in-out infinite alternate,
+        bga-22-drift 220s linear infinite;
 }
 
 .bga-22__stars--mid {
-  opacity: .72;
-  background-image: radial-gradient(var(--bga-22-star) .85px,transparent 1.05px),radial-gradient(oklch(0.86 0.09 240/.8) .7px,transparent .95px);
-  background-size: 83px 83px,127px 127px;
-  background-position: 0 0,47px 61px;
-  animation: bga-22-tw 5s ease-in-out infinite alternate-reverse,bga-22-drift 150s linear infinite;
+    opacity: .72;
+
+    background-image:
+        radial-gradient(
+            var(--bga-22-star) .85px,
+            transparent 1.05px
+        ),
+        radial-gradient(
+            oklch(0.86 0.09 240/.8) .7px,
+            transparent .95px
+        );
+
+    background-size:
+        83px 83px,
+        127px 127px;
+
+    background-position:
+        0 0,
+        47px 61px;
+
+    animation:
+        bga-22-tw 5s ease-in-out infinite alternate-reverse,
+        bga-22-drift 150s linear infinite;
 }
 
 .bga-22__stars--near {
-  background-image: radial-gradient(var(--bga-22-star) 1.2px,transparent 1.45px);
-  background-size: 140px 140px;
-  background-position: 66px 31px;
-  filter: drop-shadow(0 0 4px oklch(0.9 0.06 240/.7));
-  animation: bga-22-tw 3.6s ease-in-out infinite alternate,bga-22-drift 95s linear infinite;
+    background-image:
+        radial-gradient(
+            var(--bga-22-star) 1.2px,
+            transparent 1.45px
+        );
+
+    background-size: 140px 140px;
+    background-position: 66px 31px;
+
+    filter:
+        drop-shadow(
+            0 0 4px oklch(0.9 0.06 240/.7)
+        );
+
+    animation:
+        bga-22-tw 3.6s ease-in-out infinite alternate,
+        bga-22-drift 95s linear infinite;
 }
 
 @keyframes bga-22-tw {
-  from {
-    opacity: .4;
-  }
+    from {
+        opacity: .4;
+    }
 
-  to {
-    opacity: 1;
-  }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes bga-22-drift {
-  to {
-    background-position-x: -140px;
-  }
+    to {
+        background-position-x: -140px;
+    }
 }
 
 .bga-22__shower {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
 }
 
 .bga-22__meteor {
-  position: absolute;
-  top: var(--bga-22-top);
-  left: var(--bga-22-left);
-  width: var(--bga-22-len,200px);
-  height: 2px;
-  border-radius: 99px;
-  rotate: 32deg;
-  transform-origin: 0 50%;
-  opacity: 0;
-  background: linear-gradient(270deg,oklch(1 0 0) 0 2%,color-mix(in oklab,var(--bga-22-acc) 72%,transparent) 18%,transparent 100%);
-  filter: drop-shadow(0 0 6px oklch(0.9 0.08 240/.9));
-  animation: bga-22-fall 26s cubic-bezier(.5,0,.85,.45) infinite;
-  animation-delay: var(--bga-22-d,0s);
+    position: absolute;
+
+    top: var(--bga-22-top);
+    left: var(--bga-22-left);
+
+    width: var(--bga-22-len, 200px);
+    height: 2px;
+
+    border-radius: 99px;
+
+    rotate: 32deg;
+    transform-origin: 0 50%;
+
+    opacity: 0;
+
+    background:
+        linear-gradient(
+            270deg,
+            oklch(1 0 0) 0 2%,
+            color-mix(
+                in oklab,
+                var(--bga-22-acc) 72%,
+                transparent
+            ) 18%,
+            transparent 100%
+        );
+
+    filter:
+        drop-shadow(
+            0 0 6px oklch(0.9 0.08 240/.9)
+        );
+
+    animation:
+        bga-22-fall
+        26s cubic-bezier(.5,0,.85,.45)
+        infinite;
+
+    animation-delay: var(--bga-22-d, 0s);
 }
 
 @keyframes bga-22-fall {
-  0% {
-    translate: 0 0;
-    opacity: 0;
-    scale: .35 1;
-  }
 
-  1.2% {
-    opacity: 1;
-  }
+    0% {
+        translate: 0 0;
+        opacity: 0;
+        scale: .35 1;
+    }
 
-  9% {
-    translate: 78vw 62vh;
-    opacity: 0;
-    scale: 1.5 1;
-  }
+    1.2% {
+        opacity: 1;
+    }
 
-  100% {
-    translate: 78vw 62vh;
-    opacity: 0;
-    scale: 1.5 1;
-  }
+    9% {
+        translate: 78vw 62vh;
+        opacity: 0;
+        scale: 1.5 1;
+    }
+
+    100% {
+        translate: 78vw 62vh;
+        opacity: 0;
+        scale: 1.5 1;
+    }
 }
 
 .bga-22__stage {
