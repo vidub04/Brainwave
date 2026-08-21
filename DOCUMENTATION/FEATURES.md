@@ -1,5 +1,5 @@
 [x] long term candidate memory  
-[] coding agentic  
+[x] coding agentic  
 [] skill gap  
 []rag  
 []integrity detection  
