@@ -56,11 +56,17 @@ function renderMemoryPanel(memory) {
     const el = document.getElementById("memoryPanel");
     el.classList.remove("hidden");
 
-    const trendLabel = {
-        improving: "↑ Improving",
-        declining: "↓ Declining",
-        stable: "→ Stable"
-    }[memory.trend_direction] || "→ Stable";
+    const trendIcon = {
+        improving: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="18 15 12 9 6 15"/></svg>`,
+        declining: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="6 9 12 15 18 9"/></svg>`,
+        stable: `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><line x1="5" y1="12" x2="19" y2="12"/></svg>`
+    }[memory.trend_direction] || `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><line x1="5" y1="12" x2="19" y2="12"/></svg>`;
+
+    const trendText = {
+        improving: "Improving",
+        declining: "Declining",
+        stable: "Stable"
+    }[memory.trend_direction] || "Stable";
 
     const trendClass = {
         improving: "trend-up",
@@ -86,7 +92,7 @@ function renderMemoryPanel(memory) {
                 <div class="summary-label">Historical Average</div>
             </div>
             <div class="memory-stat">
-                <div class="summary-value ${trendClass}">${trendLabel}</div>
+                <div class="summary-value ${trendClass}">${trendIcon} ${trendText}</div>
                 <div class="summary-label">Trend</div>
             </div>
         </div>

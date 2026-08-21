@@ -86,10 +86,10 @@ async function handleLandingResumeUpload(event) {
         uploadedResumeStructured = data.structured || {};
         uploadedResumeText = data.raw_text || "";
 
-        statusPill.innerText = "✓ Attached";
+        statusPill.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Attached`;
         statusPill.classList.remove("loading");
         statusPill.classList.add("attached");
-        fileNameDisplay.innerText = `📄 ${file.name} (${uploadedResumeStructured.years_experience || 2}+ yrs exp)`;
+        fileNameDisplay.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:6px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${escapeHtml(file.name)} (${uploadedResumeStructured.years_experience || 2}+ yrs exp)`;
 
         // Render extracted skills pills
         const skills = uploadedResumeStructured.skills || [];
@@ -181,7 +181,10 @@ async function startAdaptiveInterviewSession() {
         // Reset Decision Drawer
         document.getElementById("decisionLogList").innerHTML = `
             <div class="decision-entry initial">
-                <div class="decision-step-badge">🚀 Interview Initialized</div>
+                <div class="decision-step-badge">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Interview Initialized</span>
+                </div>
                 <p><strong>Role:</strong> ${escapeHtml(selectedRole)}</p>
                 <p><strong>Initial Focus:</strong> ${escapeHtml(startData.question.skill)}</p>
                 <p><strong>Baseline Difficulty:</strong> Level ${startData.current_difficulty}/5</p>
@@ -275,8 +278,13 @@ async function sendPrompt() {
             const chatBox = document.getElementById("chatBox");
             const rows = exec.results.map(r => `
                 <div class="test-case-row ${r.passed ? 'pass' : 'fail'}">
-                    ${r.passed ? "✅" : "❌"} Input: ${JSON.stringify(r.input_args)} → 
-                    Expected: ${JSON.stringify(r.expected_output)}, Got: ${JSON.stringify(r.actual_output)}
+                    <span class="test-status-pill ${r.passed ? 'pass' : 'fail'}">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            ${r.passed ? '<polyline points="20 6 9 17 4 12"/>' : '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
+                        </svg>
+                        ${r.passed ? "Passed" : "Failed"}
+                    </span>
+                    <span>Input: <code>${escapeHtml(JSON.stringify(r.input_args))}</code> → Expected: <code>${escapeHtml(JSON.stringify(r.expected_output))}</code>, Got: <code>${escapeHtml(JSON.stringify(r.actual_output))}</code></span>
                     ${r.error ? `<span class="test-error">${escapeHtml(r.error)}</span>` : ""}
                 </div>
             `).join("");
@@ -345,16 +353,43 @@ function appendUserMessage(text) {
 
     chatBox.innerHTML += `
     <div class="message user">
-        <div class="avatar">👤</div>
+        <div class="avatar user-avatar" title="Candidate">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        </div>
         <div class="bubble">${bubbleContent}</div>
     </div>
     `;
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
+function getSpeakerAvatarHtml(speaker) {
+    if (speaker === "Ricky") {
+        return `
+        <div class="avatar bot-avatar bot-ricky" title="Ricky · Behavioral & Leadership Lead">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+        </div>`;
+    }
+    return `
+    <div class="avatar bot-avatar bot-alex" title="Alex · Technical Lead">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+            <rect x="9" y="9" width="6" height="6"/>
+            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+        </svg>
+    </div>`;
+}
+
 function appendBotQuestion(qItem) {
     const speaker = qItem.speaker || "Alex";
-    const avatar = speaker === "Ricky" ? "👔" : "🧑‍💻";
+    const avatarHtml = getSpeakerAvatarHtml(speaker);
     const whyText = qItem.why_this_question || "";
 
     const whyBadgeHtml = whyText ? `
@@ -370,7 +405,7 @@ function appendBotQuestion(qItem) {
     const chatBox = document.getElementById("chatBox");
     chatBox.innerHTML += `
     <div class="message bot" data-speaker="${speaker}">
-        <div class="avatar">${avatar}</div>
+        ${avatarHtml}
         <div class="bubble">
             <div class="bubble-header">
                 <span class="speaker-name">${speaker} (AI Interviewer)</span>
@@ -399,12 +434,13 @@ function appendBotQuestion(qItem) {
 
 function appendBotMessage(data) {
     const chatBox = document.getElementById("chatBox");
-    const avatar = data.speaker === "Ricky" ? "👔" : "🧑‍💻";
+    const speaker = data.speaker || "Alex";
+    const avatarHtml = getSpeakerAvatarHtml(speaker);
     chatBox.innerHTML += `
     <div class="message bot">
-        <div class="avatar">${avatar}</div>
+        ${avatarHtml}
         <div class="bubble">
-            <div class="speaker-name">${data.speaker || "AI Interviewer"}</div>
+            <div class="speaker-name">${speaker} (AI Interviewer)</div>
             <div>${formatMessageText(data.message)}</div>
         </div>
     </div>
@@ -479,7 +515,7 @@ function toggleMicRecording() {
             speechRecognizer.start();
             isRecordingVoice = true;
             micBtn.classList.add("recording");
-            label.innerText = "🔴 Listening... (Click to stop)";
+            label.innerHTML = `<span class="rec-dot"></span><span>Listening... (Click to stop)</span>`;
         } catch (e) {
             console.error("Failed to start speech recognition:", e);
         }
@@ -487,7 +523,7 @@ function toggleMicRecording() {
         speechRecognizer.stop();
         isRecordingVoice = false;
         micBtn.classList.remove("recording");
-        label.innerText = "🎤 Start Voice Answer";
+        label.innerText = "Voice Answer";
     }
 }
 
@@ -498,7 +534,13 @@ function toggleMicRecording() {
 function toggleVoiceOutput() {
     voiceOutputEnabled = !voiceOutputEnabled;
     const btn = document.getElementById("voiceToggleBtn");
-    btn.innerText = voiceOutputEnabled ? "🔊 Voice: ON" : "🔇 Voice";
+    if (btn) {
+        if (voiceOutputEnabled) {
+            btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg><span id="voiceToggleLabel">Voice: ON</span>`;
+        } else {
+            btn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg><span id="voiceToggleLabel">Voice Muted</span>`;
+        }
+    }
     if (!voiceOutputEnabled && window.speechSynthesis) {
         window.speechSynthesis.cancel();
     }
@@ -533,13 +575,13 @@ function updateDifficultyBadge(level) {
 
     badge.className = `diff-badge diff-${level}`;
     const levelMap = {
-        1: "🟢 Level 1: Beginner",
-        2: "🔵 Level 2: Easy",
-        3: "🟡 Level 3: Intermediate",
-        4: "🟠 Level 4: Advanced",
-        5: "🔴 Level 5: Expert"
+        1: "Beginner",
+        2: "Easy",
+        3: "Intermediate",
+        4: "Advanced",
+        5: "Expert"
     };
-    badge.innerText = levelMap[level] || `Level ${level}`;
+    badge.innerHTML = `<span class="diff-signal diff-signal-${level}"></span><span>Level ${level}: ${levelMap[level] || 'Level ' + level}</span>`;
 }
 
 function updateStageBadge(stage) {
@@ -566,11 +608,11 @@ function toggleCodeEditorMode(forceState) {
 
     if (isCodeEditorOpen) {
         panel.classList.remove("hidden");
-        label.innerText = "✕ Close Code Editor";
+        label.innerText = "Close Code Editor";
         document.getElementById("codeInput").focus();
     } else {
         panel.classList.add("hidden");
-        label.innerText = "💻 Add Code Solution";
+        label.innerText = "Add Code Solution";
     }
 }
 
