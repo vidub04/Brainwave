@@ -3,66 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login · RoleReady Adaptive Mock Interviews</title>
-    <link rel="stylesheet" href="/static/style.css?v=3">
+    <title>RoleReady · Anonymous, Adaptive AI Mock Interviews</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/static/style.css?v=5">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
-<body class="login-page">
+<body class="marketing-page">
 
-    <div id="login-container">
+    <!-- Top Nav -->
+    <nav class="site-nav">
+        <div class="site-nav-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"/>
+                <rect x="9" y="9" width="6" height="6"/>
+                <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+            </svg>
+            <span>RoleReady</span>
+        </div>
+        <div class="site-nav-links">
+            <a href="#how-it-works">How it works</a>
+            <a href="#features">What it covers</a>
+            <a href="/signup" class="site-nav-cta">Create account</a>
+        </div>
+    </nav>
 
-        <header class="login-header">
-            <div class="logo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="4" y="4" width="16" height="16" rx="2"/>
-                    <rect x="9" y="9" width="6" height="6"/>
-                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
-                </svg>
-                <span>RoleReady</span>
-            </div>
-            <p class="login-subtitle">Sign in or create an account to practice adaptive AI mock interviews</p>
-        </header>
-
-        <div class="login-form">
-
-            <div class="form-group">
-                <label for="email">Email address</label>
-                <input
-                    id="email"
-                    type="email"
-                    placeholder="candidate@example.com"
-                    autocomplete="email"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••••••"
-                    autocomplete="current-password"
-                    required
-                >
-            </div>
-
-            <div class="login-buttons">
-                <button class="btn-primary" style="flex: 1;" onclick="signIn()">
-                    Log In
-                </button>
-            </div>
-
-            <p class="auth-switch-link">
-                New to RoleReady? <a href="/signup">Create an account</a>
+    <!-- Hero: marketing copy + sign-in card side by side -->
+    <section class="marketing-hero">
+        <div class="marketing-hero-copy">
+            <div class="hero-badge">⚡ Adapts to you — no fixed script</div>
+            <h1>Practice interviews with an<br>AI that actually pushes back</h1>
+            <p class="hero-lede">
+                RoleReady runs a real planner → evaluator → adaptation loop on every answer you give —
+                shifting difficulty, digging into weak spots, and diagnosing exactly what you missed.
+                Anonymous, on your schedule, no human interviewer required.
             </p>
 
-            <p id="authMsg" style="display:none; font-size: 0.85rem; margin-top: 12px; text-align: center;"></p>
-
+            <ul class="track-checklist">
+                <li><span class="check-mark">✓</span> Algorithms &amp; Data Structures</li>
+                <li><span class="check-mark">✓</span> System Design &amp; Distributed Systems</li>
+                <li><span class="check-mark">✓</span> DBMS, OS &amp; Computer Networks</li>
+                <li><span class="check-mark">✓</span> Live coding round with real test execution</li>
+                <li><span class="check-mark">✓</span> Behavioral, leadership &amp; conflict resolution</li>
+                <li><span class="check-mark">✓</span> Résumé-aware, role-calibrated questions</li>
+            </ul>
         </div>
 
-    </div>
+        <div class="marketing-hero-auth">
+            <div id="login-container">
+                <div class="login-form">
+                    <div class="term-chrome" style="margin: -32px -32px 24px; border-radius: 16px 16px 0 0;">
+                        <div class="term-dots"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span></div>
+                        <div class="term-tab">session.auth</div>
+                        <div class="term-live"><span class="term-live-dot"></span>secure</div>
+                    </div>
+
+                    <p class="login-subtitle" style="text-align:left; margin-bottom: 20px;">Sign in to continue practicing</p>
+
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input
+                            id="email"
+                            type="email"
+                            placeholder="candidate@example.com"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            placeholder="••••••••••••"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+
+                    <div class="login-buttons">
+                        <button class="btn-primary" style="flex: 1;" onclick="signIn()">
+                            Log In
+                        </button>
+                    </div>
+
+                    <p class="auth-switch-link">
+                        New to RoleReady? <a href="/signup">Create an account</a>
+                    </p>
+
+                    <p id="authMsg" style="display:none; font-size: 0.85rem; margin-top: 12px; text-align: center;"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="section-heading">
+            <span class="mono-label">How it works</span>
+            <h2>Three steps. No script.</h2>
+        </div>
+        <div class="steps-row">
+            <div class="step-card">
+                <div class="step-num">01</div>
+                <h3>Set up your session</h3>
+                <p>Pick a target role, paste a job description, and optionally upload your résumé — it gets parsed and blended straight into the questions.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">02</div>
+                <h3>Answer under real pressure</h3>
+                <p>Alex (technical) and Ricky (behavioral) ask one question at a time. Every answer is scored, and the next question adapts — harder, easier, or a pivot.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">03</div>
+                <h3>Get the debrief</h3>
+                <p>An evidence-backed report — strengths, weaknesses, transcript citations, and a 7/14/30-day prep roadmap — waiting the moment you finish.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature grid -->
+    <section id="features" class="feature-grid-section">
+        <div class="section-heading">
+            <span class="mono-label">Under the hood</span>
+            <h2>What makes it actually adaptive</h2>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3>Adaptive decision engine</h3>
+                <p>A planner, an evaluator, and a decision engine run every turn — difficulty rises and falls with your real performance, not a timer.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3>Live coding round</h3>
+                <p>Submitted code is actually executed against test cases in a sandboxed runner — not just graded on vibes by an LLM.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🗂️</div>
+                <h3>Long-term memory</h3>
+                <p>Recurring strengths and weak spots are tracked across every session you complete, and feed into how future interviews are planned.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Performance dashboard</h3>
+                <p>Score trends by category, hiring recommendations, and a full history of past sessions — all in one place.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛠️</div>
+                <h3>Judge decision log</h3>
+                <p>An inspectable, real-time trace of every adaptation the engine made this turn, and why — full transparency, not a black box.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Private by default</h3>
+                <p>Every transcript, résumé, and scorecard is isolated to your account with Supabase Row Level Security.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <h2>See where you actually stand.</h2>
+        <p>No fixed question bank. No generic feedback. Just a mock interview that reacts the way a real one would.</p>
+        <a href="/signup" class="btn-primary final-cta-btn">Start a free session</a>
+    </section>
+
+    <footer class="site-footer">
+        <span>RoleReady</span>
+        <span class="mono-label">Adaptive AI Interview Engine</span>
+    </footer>
 
     <script src="/static/config.js"></script>
     <script src="/static/auth.js"></script>

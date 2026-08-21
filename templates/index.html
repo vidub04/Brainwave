@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RoleReady · Adaptive AI Interview Engine</title>
-    <link rel="stylesheet" href="/static/style.css?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="/static/style.css?v=4">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -12,7 +13,7 @@
 <!-- Landing / Setup Screen -->
 <section id="landing" class="landing">
     <div class="hero">
-        <div class="hero-badge">⚡ Production-Grade Adaptive AI Interview Engine</div>
+        <div class="hero-badge">⚡ Adaptive interview engine — evaluates, adapts, diagnoses in real time</div>
 
         <div class="logo-circle">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -22,10 +23,16 @@
             </svg>
         </div>
 
-        <h1>RoleReady Adaptive Interview Engine</h1>
-        <p>Genuinely reactive mock interviews. Evaluates technical depth, diagnoses missing concepts, dynamically shifts difficulty, and generates evidence-backed reports.</p>
+        <h1>Anonymous mock interviews<br>that actually adapt to you</h1>
+        <p>No fixed script. RoleReady evaluates every answer, diagnoses missing concepts, shifts difficulty in real time, and hands you an evidence-backed report at the end.</p>
 
         <div class="hero-action-card">
+            <div class="term-chrome" style="margin: -32px -32px 24px; border-radius: 16px 16px 0 0;">
+                <div class="term-dots"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span></div>
+                <div class="term-tab">configure_interview.yml</div>
+                <div class="term-live"><span class="term-live-dot"></span>ready</div>
+            </div>
+
             <div class="form-group">
                 <label for="roleSelect">Target Role</label>
                 <div class="select-container">

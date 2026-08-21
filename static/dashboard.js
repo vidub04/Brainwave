@@ -10,14 +10,14 @@ const CATEGORY_LABELS = {
 };
 
 const CATEGORY_COLORS = {
-    technical_knowledge: "#2D9CDB",
-    problem_solving: "#0EBB8A",
-    core_cs_fundamentals: "#A78BFA",
-    project_knowledge: "#F59E0B",
-    communication: "#EF4444",
-    confidence: "#EC4899",
-    leadership: "#14B8A6",
-    behavioral_skills: "#F472B6",
+    technical_knowledge: "#4fd1e8",
+    problem_solving: "#34d399",
+    core_cs_fundamentals: "#a78bfa",
+    project_knowledge: "#ffb020",
+    communication: "#f87171",
+    confidence: "#f472b6",
+    leadership: "#38bdf8",
+    behavioral_skills: "#fb923c",
 };
 
 (async function init() {
@@ -153,8 +153,8 @@ function renderChart(scorecards) {
     // gridlines + y-axis labels (0-10)
     for (let i = 0; i <= 5; i++) {
         const y = padding.top + height - (i * 2 * height / 10);
-        svgContent += `<line x1="${padding.left}" y1="${y}" x2="${padding.left + width}" y2="${y}" stroke="#374151" stroke-width="1"/>`;
-        svgContent += `<text x="${padding.left - 10}" y="${y + 4}" fill="#9ca3af" font-size="11" text-anchor="end">${i * 2}</text>`;
+        svgContent += `<line x1="${padding.left}" y1="${y}" x2="${padding.left + width}" y2="${y}" stroke="#212838" stroke-width="1"/>`;
+        svgContent += `<text x="${padding.left - 10}" y="${y + 4}" fill="#5c6580" font-size="11" font-family="JetBrains Mono, monospace" text-anchor="end">${i * 2}</text>`;
     }
 
     // one line per category
@@ -178,7 +178,7 @@ function renderChart(scorecards) {
     // x-axis session labels
     scorecards.forEach((sc, i) => {
         const x = padding.left + i * stepX;
-        svgContent += `<text x="${x}" y="${padding.top + height + 22}" fill="#9ca3af" font-size="11" text-anchor="middle">#${i + 1}</text>`;
+        svgContent += `<text x="${x}" y="${padding.top + height + 22}" fill="#5c6580" font-size="11" font-family="JetBrains Mono, monospace" text-anchor="middle">#${i + 1}</text>`;
     });
 
     svg.innerHTML = svgContent;
