@@ -1,3 +1,5 @@
+##defining shapes and classes for whole app
+##review done
 from enum import Enum
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field

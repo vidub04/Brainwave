@@ -42,6 +42,8 @@ class InterviewOrchestrator:
         self.memory_manager = CandidateMemoryManager(supabase_client)
         self.code_executor = CodeExecutor()
 
+      #creating new interview with getting plan info from planner.py  
+
 
     def create_interview(
         self,
@@ -85,6 +87,7 @@ class InterviewOrchestrator:
 
         return state
 
+##strating interview with question generated from question_generator.py
     def start_interview(self, interview_id: str) -> Dict[str, Any]:
         """Generates Question 1 for the interview session."""
         state = self.state_manager.get_state(interview_id)

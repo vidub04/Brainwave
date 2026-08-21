@@ -1,3 +1,4 @@
+##review done
 import os
 import re
 import json
@@ -24,7 +25,7 @@ class LLMClient:
         self.session.headers.update({"Content-Type": "application/json"})
         if not self.api_key:
             logger.warning("GEMINI_API_KEY is not set. LLM requests will use fallback mode.")
-
+##clean extra white spaces and commentary
     def clean_json_string(self, raw_text: str) -> str:
         """Extracts and repairs JSON text from markdown blocks or raw response."""
         text = raw_text.strip()

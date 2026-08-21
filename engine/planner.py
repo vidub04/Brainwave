@@ -6,7 +6,8 @@ from .llm_client import get_llm_client, LLMClient
 logger = logging.getLogger("adaptive_engine.planner")
 
 PLANNER_SYSTEM_PROMPT = """You are an expert Technical Interview Planner and Lead Engineering Hiring Architect.
-Your task is to analyze the candidate's resume, the target job description, and the target role to generate a comprehensive, adaptive interview plan.
+Your task is to analyze the candidate's resume, the target job description, 
+and the target role to generate a comprehensive, adaptive interview plan.
 
 Generate structured JSON matching this schema:
 {

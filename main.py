@@ -1,3 +1,4 @@
+##review done
 import os
 import re
 import json
@@ -121,7 +122,7 @@ async def api_auth_signup(data: AuthRequest):
         logger.warning(f"Error during admin user creation: {e}")
         raise HTTPException(status_code=400, detail=err_msg)
 
-
+'''
 @app.post("/api/auth/demo-login")
 async def api_auth_demo():
     """
@@ -145,7 +146,7 @@ async def api_auth_demo():
         "email": demo_email,
         "password": demo_password
     }
-
+'''
 
 # ============================================================
 # Production Adaptive Interview Engine API Endpoints
@@ -161,6 +162,7 @@ async def api_create_interview(
     """
     try:
         user_id = getattr(user, "id", None)
+        #call orchestrator to create interview with all data fields
         state = orchestrator.create_interview(
             role=data.role,
             job_description=data.job_description,
@@ -184,6 +186,7 @@ async def api_create_interview(
                 logger.warning(f"Supabase conversation insert skipped: {e}")
 
         return {
+            ##planner returns interview plan
             "interview_id": state.interview_id,
             "role": state.role,
             "interview_plan": state.interview_plan,
@@ -229,6 +232,8 @@ async def api_start_interview(
         logger.error(f"Error in api_start_interview: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
+##add answer to db and evaluate it
 
 @app.post("/api/interview/{interview_id}/answer")
 async def api_submit_answer(
@@ -316,7 +321,7 @@ async def api_submit_answer(
         logger.error(f"Error in api_submit_answer: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
+##get state of interview currently
 @app.get("/api/interview/{interview_id}/state")
 async def api_get_interview_state(
     interview_id: str,
@@ -328,7 +333,7 @@ async def api_get_interview_state(
         raise HTTPException(status_code=404, detail="Interview not found")
     return state
 
-
+##give decision log of interview
 @app.get("/api/interview/{interview_id}/decision-log")
 async def api_get_decision_log(
     interview_id: str,
@@ -357,7 +362,7 @@ async def api_get_interview_report(
         logger.error(f"Error in api_get_interview_report: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-
+##resume a given session of interview
 @app.post("/api/interview/{interview_id}/resume")
 async def api_resume_interview(
     interview_id: str,
@@ -500,7 +505,7 @@ async def get_history(conversation_id: str, user=Depends(get_current_user)):
         msgs.append({"role": "user", "content": h.candidate_answer})
     return {"messages": msgs}
 
-
+##progress
 @app.get("/app/progress")
 async def get_progress(user=Depends(get_current_user)):
     """Returns the candidate's past scorecards (for the dashboard trend chart)
@@ -524,7 +529,7 @@ async def get_progress(user=Depends(get_current_user)):
         "candidate_memory": memory
     }
 
-
+##profile page
 @app.get("/app/profile")
 async def get_profile(user=Depends(get_current_user)):
     """Returns account info, quick stats, and the most recently uploaded resume
@@ -583,7 +588,7 @@ async def get_profile(user=Depends(get_current_user)):
         "resume": latest_resume
     }
 
-
+##user resume upload
 @app.post("/app/resume/upload")
 async def upload_resume(file: UploadFile = File(...), user=Depends(get_current_user)):
     if not file.filename.lower().endswith((".pdf", ".docx")):

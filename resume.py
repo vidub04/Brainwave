@@ -1,3 +1,4 @@
+##review done
 import json
 import pdfplumber
 import docx
@@ -5,6 +6,7 @@ from io import BytesIO
 from typing import Dict, Any
 
 
+##extraction for pdf
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     text_parts = []
     with pdfplumber.open(BytesIO(file_bytes)) as pdf:
@@ -15,6 +17,7 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
     return "\n".join(text_parts)
 
 
+##extraction for .docx
 def extract_text_from_docx(file_bytes: bytes) -> str:
     document = docx.Document(BytesIO(file_bytes))
     return "\n".join(p.text for p in document.paragraphs if p.text.strip())
@@ -30,6 +33,7 @@ def extract_raw_text(filename: str, file_bytes: bytes) -> str:
         raise ValueError("Unsupported file type. Please upload a .pdf or .docx resume.")
 
 
+##ask gemini for resume parsing
 def structure_resume(llm_or_gemini_client, raw_text: str) -> dict:
     """
     Turns raw resume text into structured JSON.
