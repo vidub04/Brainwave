@@ -3384,3 +3384,10 @@ textarea::placeholder {
     opacity: .55;
   }
 }
+
+.glow-text {
+    color: #f5f7ff;
+    text-shadow:
+        0 0 8px rgba(99, 102, 241, 0.35),
+        0 0 20px rgba(59, 130, 246, 0.18);
+}
