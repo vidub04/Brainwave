@@ -7,7 +7,45 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 :root {
-    /* ---------- Core Surface Palette (Obsidian Slate) ---------- */
+
+    /* ---------- Light Theme Override ---------- */
+    [data-theme="light"] {
+        --bg-canvas: #f4f6fb;
+        --bg-card: #ffffff;
+        --bg-surface: #f1f4f9;
+        --bg-surface-elevated: #e9edf5;
+        --bg-surface-hover: #dde3ee;
+        --bg-surface-active: #cfd8e8;
+        --bg-glass: rgba(255, 255, 255, 0.85);
+
+        --border-subtle: rgba(15, 23, 42, 0.06);
+        --border-default: rgba(15, 23, 42, 0.12);
+        --border-strong: rgba(15, 23, 42, 0.22);
+
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --text-disabled: #94a3b8;
+
+        --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.06);
+        --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10);
+        --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.14);
+        --shadow-xl: 0 20px 40px -8px rgba(15, 23, 42, 0.18);
+        --shadow-card: 0 0 0 1px var(--border-subtle), 0 8px 24px -4px rgba(15, 23, 42, 0.10);
+    }
+
+    [data-theme="light"] body {
+        background-image:
+            radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+            radial-gradient(circle at 90% 80%, rgba(37, 99, 235, 0.05) 0%, transparent 40%);
+    }
+
+    /* Smooth transition when switching themes */
+    body, .hero, .interview-main, .history-sidebar, .bot .bubble, .dashboard,
+    .summary-stat, .memory-panel, .chart-card, .session-table, #login-container {
+        transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+        /* ---------- Core Surface Palette (Obsidian Slate) ---------- */
     --bg-base: #07090e;
     --bg-surface: #0c1017;
     --bg-surface-elevated: #111722;
@@ -350,6 +388,27 @@ input, textarea, select {
     color: var(--text-primary);
     border-color: var(--border-medium);
     transform: translateY(-1px);
+}
+/*light theme */
+.theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--bg-surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border-default);
 }
 
 .toolbar-btn {
