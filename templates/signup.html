@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login · RoleReady Adaptive Mock Interviews</title>
+    <title>Sign Up · RoleReady Adaptive Mock Interviews</title>
     <link rel="stylesheet" href="/static/style.css?v=3">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -21,10 +21,20 @@
                 </svg>
                 <span>RoleReady</span>
             </div>
-            <p class="login-subtitle">Sign in or create an account to practice adaptive AI mock interviews</p>
+            <p class="login-subtitle">Create an account to start practicing adaptive AI mock interviews</p>
         </header>
 
         <div class="login-form">
+
+            <div class="form-group">
+                <label for="fullName">Full name <span class="optional-tag">(optional)</span></label>
+                <input
+                    id="fullName"
+                    type="text"
+                    placeholder="Jane Doe"
+                    autocomplete="name"
+                >
+            </div>
 
             <div class="form-group">
                 <label for="email">Email address</label>
@@ -43,19 +53,30 @@
                     id="password"
                     type="password"
                     placeholder="••••••••••••"
-                    autocomplete="current-password"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm password</label>
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••••••"
+                    autocomplete="new-password"
                     required
                 >
             </div>
 
             <div class="login-buttons">
-                <button class="btn-primary" style="flex: 1;" onclick="signIn()">
-                    Log In
+                <button id="signupBtn" class="btn-primary" style="flex: 1;" onclick="handleSignUp()">
+                    Create Account
                 </button>
             </div>
 
             <p class="auth-switch-link">
-                New to RoleReady? <a href="/signup">Create an account</a>
+                Already have an account? <a href="/">Log in</a>
             </p>
 
             <p id="authMsg" style="display:none; font-size: 0.85rem; margin-top: 12px; text-align: center;"></p>
@@ -66,12 +87,13 @@
 
     <script src="/static/config.js"></script>
     <script src="/static/auth.js"></script>
+    <script src="/static/signup.js"></script>
 
     <script>
-        // Allow pressing Enter key in inputs to log in
-        document.querySelectorAll("#email, #password").forEach(el => {
+        // Allow pressing Enter key in inputs to submit the form
+        document.querySelectorAll("#fullName, #email, #password, #confirmPassword").forEach(el => {
             el.addEventListener("keydown", (e) => {
-                if (e.key === "Enter") signIn();
+                if (e.key === "Enter") handleSignUp();
             });
         });
     </script>

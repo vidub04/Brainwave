@@ -2635,44 +2635,168 @@ body.login-page {
     font-weight: 600;
 }
 
-/* ---------- Login Additions ---------- */
-.divider-row {
+/* ---------- Login / Sign Up Additions ---------- */
+.auth-switch-link {
+    text-align: center;
+    font-size: var(--font-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-2);
+}
+
+.auth-switch-link a {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-switch-link a:hover {
+    text-decoration: underline;
+}
+
+.optional-tag {
+    text-transform: none;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: normal;
+}
+
+/* ==========================================================================
+   5. PROFILE PAGE
+   ========================================================================== */
+
+.dashboard-header-actions {
     display: flex;
     align-items: center;
-    text-align: center;
-    margin: 14px 0;
-    color: var(--text-muted);
-    font-size: var(--font-xs);
+    gap: var(--space-3);
 }
 
-.divider-row::before, .divider-row::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid var(--border-subtle);
+.profile-identity-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
 }
 
-.divider-row span {
-    padding: 0 10px;
-}
-
-.btn-demo-access {
-    width: 100%;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 51, 234, 0.15));
-    border: 1px solid rgba(59, 130, 246, 0.35);
-    color: #93c5fd;
-    padding: 10px 16px;
-    border-radius: var(--radius-md);
-    font-size: var(--font-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-.btn-demo-access:hover {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(147, 51, 234, 0.25));
-    border-color: #60a5fa;
+.profile-avatar {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary), #9333ea);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+    font-size: var(--font-xl);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.profile-identity-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.profile-identity-info h2 {
+    font-size: var(--font-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.profile-email {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+}
+
+.profile-joined {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+}
+
+.resume-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.resume-upload-action {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.resume-upload-btn {
+    cursor: pointer;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.resume-upload-status {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+}
+
+.resume-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-top: var(--space-5);
+}
+
+.resume-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
+}
+
+.resume-detail-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.resume-detail-value {
+    font-size: var(--font-base);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.resume-summary-text {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.resume-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.resume-education-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.empty-hint {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    font-style: italic;
 }
 
 

@@ -53,6 +53,16 @@ async def dashboard_page(request: Request):
     return templates.TemplateResponse(request, "dashboard.html")
 
 
+@app.get("/signup", response_class=HTMLResponse)
+async def signup_window(request: Request):
+    return templates.TemplateResponse(request, "signup.html")
+
+
+@app.get("/profile", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    return templates.TemplateResponse(request, "profile.html")
+
+
 @app.get("/config")
 async def get_config():
     return {
@@ -68,6 +78,7 @@ async def get_config():
 class AuthRequest(BaseModel):
     email: str
     password: str
+    full_name: Optional[str] = None
 
 
 @app.post("/api/auth/signup")
@@ -77,6 +88,7 @@ async def api_auth_signup(data: AuthRequest):
     """
     email = data.email.strip().lower()
     password = data.password.strip()
+    full_name = data.full_name.strip() if data.full_name else None
 
     if len(password) < 6:
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
@@ -85,11 +97,15 @@ async def api_auth_signup(data: AuthRequest):
         raise HTTPException(status_code=500, detail="Authentication service unavailable.")
 
     try:
-        res = supabase.auth.admin.create_user({
+        create_payload = {
             "email": email,
             "password": password,
             "email_confirm": True
-        })
+        }
+        if full_name:
+            create_payload["user_metadata"] = {"full_name": full_name}
+
+        res = supabase.auth.admin.create_user(create_payload)
         return {
             "status": "ok",
             "message": "Account created and verified! Logging you in...",
@@ -506,6 +522,65 @@ async def get_progress(user=Depends(get_current_user)):
     return {
         "scorecards": scorecards,
         "candidate_memory": memory
+    }
+
+
+@app.get("/app/profile")
+async def get_profile(user=Depends(get_current_user)):
+    """Returns account info, quick stats, and the most recently uploaded resume
+    for the profile page."""
+    stats = {"total_interviews": 0, "avg_score": None, "last_interview_at": None}
+    latest_resume = None
+
+    if supabase:
+        try:
+            scorecards = supabase.table("scorecards") \
+                .select("*") \
+                .eq("user_id", user.id) \
+                .order("created_at") \
+                .execute().data or []
+
+            if scorecards:
+                category_keys = [
+                    "technical_knowledge", "problem_solving", "core_cs_fundamentals",
+                    "project_knowledge", "communication", "confidence",
+                    "leadership", "behavioral_skills"
+                ]
+                overall_scores = []
+                for sc in scorecards:
+                    vals = [sc.get(k) or 0 for k in category_keys]
+                    overall_scores.append(sum(vals) / len(vals))
+
+                stats["total_interviews"] = len(scorecards)
+                stats["avg_score"] = round(sum(overall_scores) / len(overall_scores), 1)
+                stats["last_interview_at"] = scorecards[-1].get("created_at")
+        except Exception as e:
+            logger.warning(f"Could not fetch scorecards for profile: {e}")
+
+        try:
+            resumes = supabase.table("resumes") \
+                .select("filename, structured, created_at") \
+                .eq("user_id", user.id) \
+                .order("created_at", desc=True) \
+                .limit(1) \
+                .execute().data or []
+            if resumes:
+                latest_resume = resumes[0]
+        except Exception as e:
+            logger.warning(f"Could not fetch resume for profile: {e}")
+
+    full_name = None
+    user_metadata = getattr(user, "user_metadata", None) or {}
+    if isinstance(user_metadata, dict):
+        full_name = user_metadata.get("full_name")
+
+    return {
+        "email": user.email,
+        "user_id": user.id,
+        "full_name": full_name,
+        "created_at": getattr(user, "created_at", None),
+        "stats": stats,
+        "resume": latest_resume
     }
 
 

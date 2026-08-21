@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile · RoleReady</title>
+    <link rel="stylesheet" href="/static/style.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<section id="profile" class="dashboard">
+    <header class="dashboard-header">
+        <div class="header-left">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Your Profile</span>
+            </div>
+            <span class="header-subtitle">Account details, résumé on file, and your interview stats</span>
+        </div>
+        <a href="/app" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            <span>Back to Interviews</span>
+        </a>
+    </header>
+
+    <div class="dashboard-content">
+
+        <p id="profileError" class="empty-state hidden">
+            Couldn't load your profile right now — try refreshing.
+        </p>
+
+        <!-- Identity Card -->
+        <div class="profile-identity-card">
+            <div id="profileAvatar" class="profile-avatar">?</div>
+            <div class="profile-identity-info">
+                <h2 id="profileName">—</h2>
+                <p id="profileEmail" class="profile-email">—</p>
+                <p id="profileJoined" class="profile-joined">—</p>
+            </div>
+            <button onclick="signOut()" class="toolbar-btn logout-btn" style="width:auto; padding:8px 16px;">Log out</button>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="summary-row">
+            <div class="summary-stat">
+                <div id="statTotalInterviews" class="summary-value">0</div>
+                <div class="summary-label">Interviews Completed</div>
+            </div>
+            <div class="summary-stat">
+                <div id="statAvgScore" class="summary-value">—</div>
+                <div class="summary-label">Average Score</div>
+            </div>
+            <div class="summary-stat">
+                <div id="statLastInterview" class="summary-value">—</div>
+                <div class="summary-label">Last Interview</div>
+            </div>
+        </div>
+
+        <!-- Resume Card -->
+        <div class="chart-card">
+            <div class="card-header resume-card-header">
+                <div>
+                    <h3>Résumé on File</h3>
+                    <span class="card-subtitle" id="resumeFileName">No résumé uploaded yet</span>
+                </div>
+                <div class="resume-upload-action">
+                    <label for="resumeUploadInput" class="btn-secondary resume-upload-btn">
+                        Upload / Replace Résumé
+                    </label>
+                    <input type="file" id="resumeUploadInput" accept=".pdf,.docx" style="display:none;">
+                    <span id="resumeUploadStatus" class="resume-upload-status"></span>
+                </div>
+            </div>
+
+            <p id="resumeEmpty" class="empty-state">
+                Upload a résumé to have your candidate name, skills, and experience parsed automatically for smarter interview calibration.
+            </p>
+
+            <div id="resumeDetails" class="resume-details hidden">
+                <div class="resume-details-grid">
+                    <div class="resume-detail-field">
+                        <span class="summary-label">Candidate Name</span>
+                        <span id="resumeCandidateName" class="resume-detail-value">—</span>
+                    </div>
+                    <div class="resume-detail-field">
+                        <span class="summary-label">Current Role</span>
+                        <span id="resumeCurrentRole" class="resume-detail-value">—</span>
+                    </div>
+                    <div class="resume-detail-field">
+                        <span class="summary-label">Experience</span>
+                        <span id="resumeYearsExp" class="resume-detail-value">—</span>
+                    </div>
+                </div>
+
+                <p id="resumeSummary" class="resume-summary-text"></p>
+
+                <div class="resume-block">
+                    <span class="memory-skills-label">Skills</span>
+                    <div id="resumeSkills" class="skills-pills-row"></div>
+                </div>
+
+                <div class="resume-block">
+                    <span class="memory-skills-label">Education</span>
+                    <ul id="resumeEducation" class="resume-education-list"></ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<script src="/static/config.js"></script>
+<script src="/static/auth.js"></script>
+<script src="/static/profile.js"></script>
+</body>
+</html>
