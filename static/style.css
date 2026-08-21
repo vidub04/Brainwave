@@ -2994,3 +2994,73 @@ textarea::placeholder {
 @media (prefers-reduced-motion: reduce) {
     .dot-grid-bg { animation: none; }
 }
+
+/* ---------- Subtle Twinkling Stars ---------- */
+
+.stars {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.45;
+}
+
+/* Small stars */
+.stars::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 25% 70%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 40% 35%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 55% 80%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 70% 25%, rgba(255,255,255,0.8), transparent),
+        radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 92% 15%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1px 1px at 48% 10%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 78% 88%, rgba(255,255,255,0.7), transparent);
+
+    animation: stars-twinkle 5s ease-in-out infinite alternate;
+}
+
+/* Slightly larger distant stars */
+.stars::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        radial-gradient(2px 2px at 18% 45%, rgba(255,255,255,0.5), transparent),
+        radial-gradient(2px 2px at 63% 55%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 90% 75%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(2px 2px at 35% 15%, rgba(255,255,255,0.35), transparent);
+
+    animation: stars-twinkle 7s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes stars-twinkle {
+    0% {
+        opacity: 0.35;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+
+    100% {
+        opacity: 0.4;
+        transform: scale(1.01);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stars::before,
+    .stars::after {
+        animation: none;
+    }
+}
