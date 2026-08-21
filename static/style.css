@@ -2919,3 +2919,73 @@ textarea::placeholder {
     .modal-backdrop { position: static; background: white; }
     .report-card-modal { max-height: none; box-shadow: none; border: none; }
 }
+
+/* ---------- Animated Aurora Background ---------- */
+.aurora-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+    content: '';
+    position: absolute;
+    width: 60vw;
+    height: 60vw;
+    max-width: 700px;
+    max-height: 700px;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.35;
+    animation: aurora-drift 22s ease-in-out infinite alternate;
+}
+
+.aurora-bg::before {
+    background: radial-gradient(circle, #3b82f6, transparent 70%);
+    top: -10%;
+    left: -10%;
+    animation-delay: 0s;
+}
+
+.aurora-bg::after {
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    bottom: -15%;
+    right: -10%;
+    animation-delay: -11s;
+}
+
+@keyframes aurora-drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(6%, 8%) scale(1.15); }
+    100% { transform: translate(-4%, -6%) scale(0.95); }
+}
+
+
+
+@media (prefers-reduced-motion: reduce) {
+    .aurora-bg::before, .aurora-bg::after { animation: none; }
+}
+
+/* ---------- Subtle Dot Grid ---------- */
+.dot-grid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(var(--border-default) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
+    animation: dot-grid-pan 40s linear infinite;
+}
+
+@keyframes dot-grid-pan {
+    0%   { background-position: 0 0; }
+    100% { background-position: 280px 280px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dot-grid-bg { animation: none; }
+}
