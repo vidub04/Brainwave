@@ -48,17 +48,20 @@ class InterviewerAgent:
     def __init__(
         self,
         llm_client: Optional[LLMClient] = None,
-        anti_repetition: Optional[AntiRepetitionEngine] = None
+        anti_repetition: Optional[AntiRepetitionEngine] = None,
+        supabase_client=None
     ):
         self.llm = llm_client or get_llm_client()
         self.anti_repetition = anti_repetition or AntiRepetitionEngine()
+        self.supabase_client = supabase_client
 
     def _generate_coding_question(self, state, decision, target_skill, target_diff):
         bank_q = get_coding_question(
             skill=target_skill,
             role=state.role,
             difficulty=target_diff,
-            exclude_ids=state.used_coding_question_ids
+            exclude_ids=state.used_coding_question_ids,
+            supabase_client=self.supabase_client
         )
         if not bank_q:
             return None  # falls through to LLM-generated question instead

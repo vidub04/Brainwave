@@ -76,6 +76,64 @@ class AdaptiveDecisionEngine:
         scores.sort(key=lambda x: x[1], reverse=True)
         return scores
 
+    def _build_stage_schedule(
+        self,
+        stages: List[str],
+        stage_weights: Dict[str, float],
+        total_q: int
+    ) -> List[str]:
+        """
+        Builds a list of length total_q mapping each question slot to a stage, using
+        largest-remainder apportionment so counts sum exactly to total_q. Every stage with
+        weight > 0 is guaranteed at least one slot (as long as total_q >= number of such
+        stages), so a low-weight trailing stage like Behavioral can never be starved out.
+        """
+        if not stages:
+            return ["Technical Fundamentals"] * max(1, total_q)
+        total_q = max(1, total_q)
+
+        default_weight = 1.0 / len(stages)
+        raw_weights = [stage_weights.get(s, default_weight) for s in stages]
+        total_w = sum(raw_weights) or 1.0
+        norm_weights = [w / total_w for w in raw_weights]
+
+        raw_counts = [w * total_q for w in norm_weights]
+        counts = [(1 if w > 0 else 0) for w in norm_weights]
+        # Bump counts up to the floor of their raw share where that's higher than the guaranteed minimum
+        for i, raw in enumerate(raw_counts):
+            counts[i] = max(counts[i], int(raw))
+
+        # Reconcile to exactly total_q slots
+        diff = total_q - sum(counts)
+        if diff > 0:
+            remainder_order = sorted(
+                range(len(stages)),
+                key=lambda i: (raw_counts[i] - int(raw_counts[i])),
+                reverse=True
+            )
+            i = 0
+            while diff > 0:
+                counts[remainder_order[i % len(remainder_order)]] += 1
+                diff -= 1
+                i += 1
+        elif diff < 0:
+            shrink_order = sorted(range(len(stages)), key=lambda i: counts[i], reverse=True)
+            i = 0
+            guard = 0
+            while diff < 0 and guard < 10000:
+                idx = shrink_order[i % len(shrink_order)]
+                min_allowed = 1 if norm_weights[idx] > 0 else 0
+                if counts[idx] > min_allowed:
+                    counts[idx] -= 1
+                    diff += 1
+                i += 1
+                guard += 1
+
+        schedule: List[str] = []
+        for stage_name, count in zip(stages, counts):
+            schedule.extend([stage_name] * count)
+        return schedule or [stages[-1]] * total_q
+
     def decide_next_action(
         self,
         state: CandidateState,
@@ -166,12 +224,19 @@ class AdaptiveDecisionEngine:
             guardrail_reason = f"Candidate gave a solid answer ({overall:.1f}/10). Progressing across interview plan to test {top_uncovered_skill}."
             guardrail_why = f"Good foundational explanation. Let's move on to explore {top_uncovered_skill}."
 
-        # Determine target stage progression
+        # Determine target stage progression via a precomputed, guaranteed slot schedule.
+        # A pure progress-ratio/cumulative-weight threshold can mathematically never reach
+        # a low-weight trailing stage (e.g. Behavioral at 0.10) within a small total_q, since
+        # progress_ratio tops out at (total_q-1)/total_q on the last generated question. Instead,
+        # reserve explicit question slots per stage so every non-zero-weight stage is guaranteed
+        # to appear at least once.
         total_q = state.interview_plan.total_target_questions if state.interview_plan else 8
-        progress_ratio = state.questions_asked / max(1, total_q)
         stages = state.interview_plan.stages if state.interview_plan and state.interview_plan.stages else ["Technical Fundamentals", "System Design", "Behavioral"]
-        stage_idx = min(len(stages) - 1, int(progress_ratio * len(stages)))
-        target_stage = stages[stage_idx]
+        stage_weights = state.interview_plan.stage_distribution if state.interview_plan and state.interview_plan.stage_distribution else {}
+
+        schedule = self._build_stage_schedule(stages, stage_weights, total_q)
+        stage_position = min(state.questions_asked, len(schedule) - 1)
+        target_stage = schedule[stage_position]
 
         # Call LLM reasoning to refine decision within guardrails
         prompt = f"""

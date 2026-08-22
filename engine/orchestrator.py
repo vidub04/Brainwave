@@ -36,11 +36,12 @@ class InterviewOrchestrator:
         self.planner = InterviewPlanner(self.llm)
         self.evaluator = EvaluationAgent(self.llm)
         self.decision_engine = AdaptiveDecisionEngine(self.llm)
-        self.question_generator = InterviewerAgent(self.llm, self.anti_repetition)
+        self.question_generator = InterviewerAgent(self.llm, self.anti_repetition, supabase_client)
         self.state_manager = CandidateStateManager(supabase_client)
         self.report_generator = InterviewReportGenerator(self.llm)
         self.memory_manager = CandidateMemoryManager(supabase_client)
         self.code_executor = CodeExecutor()
+        self.supabase_client = supabase_client
 
       #creating new interview with getting plan info from planner.py  
 
@@ -154,7 +155,7 @@ class InterviewOrchestrator:
 
         execution_result = None
         if current_q.requires_code and current_q.coding_question_id and code_submission:
-            bank_q = get_coding_question_by_id(current_q.coding_question_id)
+            bank_q = get_coding_question_by_id(current_q.coding_question_id, supabase_client=self.supabase_client)
             if bank_q:
                 execution_result = self.code_executor.run(code_submission, bank_q)
         '''
@@ -182,7 +183,7 @@ class InterviewOrchestrator:
         action_taken = decision.get("action", AdaptationAction.SWITCH_SKILL)
 
         # Step 3: Check termination
-        if action_taken == AdaptationAction.END_INTERVIEW or state.questions_remaining <= 1:
+        if action_taken == AdaptationAction.END_INTERVIEW or state.questions_remaining <= 0:
             # Finalize state
             self.state_manager.update_after_turn(
                 state=state,
